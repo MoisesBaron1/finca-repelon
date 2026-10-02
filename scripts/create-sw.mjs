@@ -6,8 +6,8 @@ const hash=createHash('sha256');for(const file of files)hash.update(await readFi
 const assets=files.map(p=>'./'+p.replace(/^dist\//,''));
 await writeFile('dist/sw.js',`const CACHE='repelon-${hash.digest('hex').slice(0,12)}';
 const ASSETS=${JSON.stringify(assets)};
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS))));
+self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('repelon-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||new URL(e.request.url).origin!==self.location.origin)return;e.respondWith(caches.match(e.request).then(found=>found||fetch(e.request).catch(()=>e.request.mode==='navigate'?caches.match('./index.html'):Response.error())))});
+self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||new URL(e.request.url).origin!==self.location.origin)return;if(e.request.mode==='navigate'){e.respondWith(fetch(e.request).catch(()=>caches.match('./index.html')));return;}e.respondWith(caches.match(e.request).then(found=>found||fetch(e.request).catch(()=>Response.error())))});
 `);
 console.log(`Offline cache: ${assets.length} assets`);
