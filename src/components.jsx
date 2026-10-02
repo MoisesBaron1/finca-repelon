@@ -1,0 +1,72 @@
+import React,{useEffect,useRef,useState,useId} from 'react';
+import {X,Leaf,Plus,ChevronRight,Check,MapPin,Navigation,LocateFixed,ZoomIn,ZoomOut,ImagePlus,AlertCircle} from 'lucide-react';
+
+export function IconButton({label,children,...props}){return <button className="icon-button" aria-label={label} title={label} {...props}>{children}</button>}
+export function Button({children,icon:Icon,variant='primary',className='',...props}){return <button className={`button ${variant} ${className}`} {...props}>{Icon&&<Icon size={17}/>}<span>{children}</span></button>}
+export function Badge({children,tone}){
+ const tones={'Verificada':'green','Activo':'green','Producción':'green','Terminada':'green','Por revisar':'amber','Alta':'red','Abierta':'amber','Pendiente':'gray','En curso':'blue','Interrumpida':'red','Floración':'amber','Baja':'gray','Media':'amber','Resuelta':'green','Reportada':'blue','Probable':'blue','Ambigua':'amber'};
+ return <span className={`badge ${tone||tones[children]||'gray'}`}>{children}</span>
+}
+export function Avatar({name='Administrador',small=false}){const initials=name.split(' ').slice(0,2).map(x=>x[0]).join('');return <span className={`avatar ${small?'small':''}`} title={name}>{initials}</span>}
+export function Empty({title='Todavía no hay registros',text='Añade el primer registro para comenzar.',action}){return <div className="empty"><Leaf size={30}/><h3>{title}</h3><p>{text}</p>{action}</div>}
+export function Dialog({title,subtitle,children,onClose,wide=false}){
+ const ref=useRef();
+ useEffect(()=>{const d=ref.current;d.showModal();const onBack=()=>onClose();window.addEventListener('native-back',onBack);return()=>{window.removeEventListener('native-back',onBack);d.close()};},[]);
+ return <dialog ref={ref} className={`dialog ${wide?'wide':''}`} aria-labelledby="dialog-title" onCancel={onClose} onClick={e=>{if(e.target===e.currentTarget)onClose()}}>
+ <div className="dialog-head"><div><h2 id="dialog-title">{title}</h2>{subtitle&&<p>{subtitle}</p>}</div><IconButton label="Cerrar" onClick={onClose}><X size={20}/></IconButton></div>
+ {children}</dialog>
+}
+export function Field({label,name,type='text',options,required=false,defaultValue,help,min,max,step,wide=false}){
+ const helpId=useId();
+ return <label className={`field ${wide?'full':''}`}><span>{label}{required&&<span className="required" aria-hidden="true"> *</span>}</span>
+ {type==='select'?<select aria-label={label} aria-describedby={help?helpId:undefined} name={name} defaultValue={defaultValue??''} required={required}><option value="" disabled>Seleccionar</option>{options?.map(o=><option key={o.value??o} value={o.value??o}>{o.label??o}</option>)}</select>:type==='textarea'?<textarea aria-label={label} aria-describedby={help?helpId:undefined} name={name} rows={3} defaultValue={defaultValue} required={required}/>:<input aria-label={label} aria-describedby={help?helpId:undefined} name={name} type={type} defaultValue={defaultValue} required={required} min={min} max={max} step={step} autoComplete={type==='password'?'new-password':'off'}/>}
+ {help&&<small id={helpId}>{help}</small>}</label>
+}
+export function RecordForm({fields,onSubmit,onCancel,values={},children,submitLabel='Guardar registro',photo=false}){
+ const [busy,setBusy]=useState(false),[error,setError]=useState(''),[image,setImage]=useState(values.photo||'');
+ async function submit(e){e.preventDefault();setBusy(true);setError('');try{const data=Object.fromEntries(new FormData(e.currentTarget));for(const f of fields)if(f.type==='number')data[f.name]=data[f.name]===''?null:Number(data[f.name]);if(image)data.photo=image;await onSubmit(data);}catch(e){setError(e.message||'No se pudo guardar. Inténtalo de nuevo.');}finally{setBusy(false);}}
+ async function attach(e){const f=e.target.files[0];if(!f)return;if(f.size>3*1024*1024){setError('La foto debe pesar menos de 3 MB.');return;}if(!['image/jpeg','image/png','image/webp'].includes(f.type)){setError('Usa una foto JPG, PNG o WebP.');return;}const reader=new FileReader();reader.onload=()=>setImage(reader.result);reader.readAsDataURL(f);}
+ return <form onSubmit={submit} className="record-form"><div className="form-grid">{fields.map(f=><Field key={f.name} {...f} defaultValue={values[f.name]??f.defaultValue}/>)}{children}
+ {photo&&<div className="field full"><span>Foto de evidencia <small>(opcional · hasta 3 MB)</small></span><label className="photo-picker"><ImagePlus size={19}/> {image?'Cambiar foto':'Añadir foto'}<input type="file" accept="image/jpeg,image/png,image/webp" onChange={attach}/></label>{image&&<div className="photo-preview"><img src={image} alt="Evidencia adjunta"/><button type="button" onClick={()=>setImage('')}>Quitar foto</button></div>}</div>}
+ </div>{error&&<p className="form-error" role="alert"><AlertCircle size={17}/>{error}</p>}<div className="dialog-foot"><span className="save-note"><Check size={14}/> Guardado en este dispositivo</span><Button type="button" variant="secondary" onClick={onCancel}>Cancelar</Button><Button type="submit" disabled={busy}>{busy?'Guardando…':submitLabel}</Button></div></form>
+}
+
+export function SectionTitle({title,subtitle,action}){return <div className="section-title"><div><h2>{title}</h2>{subtitle&&<p>{subtitle}</p>}</div>{action}</div>}
+export function PageTitle({title,subtitle,children}){return <div className="page-title"><div><h1>{title}</h1>{subtitle&&<p>{subtitle}</p>}</div><div className="page-actions">{children}</div></div>}
+export function Tabs({items,active,onChange}){return <div className="tabs" role="tablist">{items.map(x=><button key={x.value??x} role="tab" aria-selected={active===(x.value??x)} className={active===(x.value??x)?'active':''} onClick={()=>onChange(x.value??x)}>{x.label??x}{x.count!=null&&<span>{x.count}</span>}</button>)}</div>}
+
+export function FarmMap({palms=[],demo=false,selected,onSelect,compact=false,points=[],label=true}){
+ const [zoom,setZoom]=useState(1),[layer,setLayer]=useState('Todas');
+ const valid=palms.filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng));
+ const all=[...valid,...points.filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng))];
+ const lats=all.map(p=>p.lat),lngs=all.map(p=>p.lng);
+ const minLat=Math.min(...lats),maxLat=Math.max(...lats),minLng=Math.min(...lngs),maxLng=Math.max(...lngs);
+ const position=p=>({x:70+(p.lng-minLng)/(maxLng-minLng||0.001)*(demo?380:650),y:90+(maxLat-p.lat)/(maxLat-minLat||0.001)*(demo?190:240)});
+ return <div className={`farm-map ${compact?'compact':''}`}>
+ {!compact&&<div className="map-toolbar"><div className="map-layer">{['Todas','Palma','Recorrido'].map(x=><button key={x} className={layer===x?'active':''} onClick={()=>setLayer(x)}>{x}</button>)}</div><span><MapPin size={14}/>{demo?'Plano de ejemplo':'Coordenadas registradas'}</span></div>}
+ <svg viewBox="0 0 820 370" role="img" aria-label={demo?'Plano ilustrativo de la finca de ejemplo con palmas, potreros y plátano':'Plano de coordenadas locales de palmas y recorrido'}>
+ <defs><pattern id="field-grid" width="26" height="26" patternUnits="userSpaceOnUse"><path d="M26 0H0V26" stroke="#dce4d8" strokeWidth=".65" fill="none"/></pattern><pattern id="banana-lines" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><path d="M0 0V12" stroke="#d3dca6" strokeWidth="2"/></pattern></defs>
+ <rect width="820" height="370" fill="#edf1e6"/><rect width="820" height="370" fill="url(#field-grid)"/>
+ <g transform={`translate(${410*(1-zoom)} ${185*(1-zoom)}) scale(${zoom})`}>
+ {demo&&<>
+ <path d="M45 47L482 41 492 307 46 322Z" fill="#dce8ce" stroke="#a7bd99" strokeWidth="1.5"/>
+ <path d="M508 47L765 70 777 177 510 167Z" fill="#e5edcf" stroke="#b9c6a3" strokeWidth="1.5"/>
+ <path d="M510 184L776 197 766 311 515 313Z" fill="#e9eacb" stroke="#babf93" strokeWidth="1.5"/>
+ <path d="M510 184L776 197 766 311 515 313Z" fill="url(#banana-lines)"/>
+ <path d="M499 31L504 335M25 338L790 329" stroke="#c8bba2" strokeWidth="10" fill="none"/><path d="M499 31L504 335M25 338L790 329" stroke="#fffef8" strokeWidth="4" strokeDasharray="6 5" fill="none"/>
+ {label&&<><text x="60" y="66" fill="#436040" fontSize="14" fontWeight="700">Palmar norte</text><text x="588" y="112" fill="#5c6b46" fontSize="15" fontWeight="600">Potrero 1</text><text x="586" y="138" fill="#66744f" fontSize="11">Ganado bovino</text><text x="572" y="242" fill="#666b3e" fontSize="15" fontWeight="600">El Porvenir</text><text x="599" y="266" fill="#666b3e" fontSize="11">Plátano · 2,4 ha</text></>}
+ </>}
+ {layer!=='Recorrido'&&valid.map(p=>{const q=position(p),fill=p.workStatus==='verified'?'#37633f':p.visitStatus==='probable'?'#84a667':p.visitStatus==='ambiguous'?'#c99a48':'#d1daba';return <g key={p.id} onClick={()=>onSelect?.(p)} className={onSelect?'map-palm clickable':'map-palm'} role={onSelect?'button':undefined} aria-label={`${p.code} · ${p.workStatus==='verified'?'labor verificada':'sin verificar'}`} tabIndex={onSelect?0:undefined} onKeyDown={e=>{if(e.key==='Enter')onSelect?.(p)}}><title>{p.code}</title>{selected===p.id&&<circle cx={q.x} cy={q.y} r="13" fill="none" stroke="#123c30" strokeWidth="2"/>}<circle cx={q.x} cy={q.y} r="6.5" fill={demo?fill:'#477b55'} stroke={demo?'#f0f5e8':'#fff'} strokeWidth="2"/>{!compact&&zoom>1.5&&<text x={q.x+8} y={q.y+3} fontSize="8" fill="#123c30">{p.code}</text>}</g>})}
+ {points.map((p,i)=>{const prev=points[i-1];if(!prev||p.segment!==prev.segment||p.monoMs-prev.monoMs>15000||p.monoMs<=prev.monoMs||p.accuracy>20||prev.accuracy>20||p.mock||prev.mock)return null;const a=position(prev),b=position(p);return <line key={p.id} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#285fb4" strokeWidth="2.5"/>})}
+ {!all.length&&<text x="410" y="185" textAnchor="middle" fontSize="16" fill="#52694c">Añade coordenadas de palmas para ver el plano</text>}
+ </g><g transform="translate(785 30)"><path d="M0 27V5M-5 11L0 3 5 11" stroke="#53624a" fill="none" strokeWidth="1.5"/><text x="0" y="0" fontSize="12" textAnchor="middle" fill="#53624a">N</text></g>
+ </svg><div className="map-bottom"><div className="map-legend"><span><i className="legend-dot verified"/>Verificada</span><span><i className="legend-dot probable"/>Visita probable</span><span><i className="legend-dot pending"/>Sin visita</span></div><div className="map-controls"><IconButton label="Reducir zoom" onClick={()=>setZoom(z=>Math.max(1,z-.4))}><ZoomOut size={16}/></IconButton><IconButton label="Restablecer plano" onClick={()=>setZoom(1)}><LocateFixed size={16}/></IconButton><IconButton label="Ampliar zoom" onClick={()=>setZoom(z=>Math.min(2.6,z+.4))}><ZoomIn size={16}/></IconButton></div></div>
+ </div>
+}
+
+export function WeightChart({weights=[]}){
+ if(weights.length<2)return <p className="muted">Registra al menos dos pesajes para ver la evolución.</p>;
+ const w=weights.toSorted((a,b)=>a.date.localeCompare(b.date)),min=Math.min(...w.map(x=>x.kg))-10,max=Math.max(...w.map(x=>x.kg))+10;
+ const p=w.map((x,i)=>({x:40+i/(w.length-1)*450,y:150-(x.kg-min)/(max-min)*120,...x}));
+ return <svg viewBox="0 0 530 190" className="weight-chart" role="img" aria-label="Evolución de peso en kilogramos">{[min,(min+max)/2,max].map(n=><g key={n}><line x1="40" x2="510" y1={150-(n-min)/(max-min)*120} y2={150-(n-min)/(max-min)*120} stroke="#e5ebe6"/><text x="0" y={155-(n-min)/(max-min)*120} fill="#63756b" fontSize="11">{Math.round(n)}</text></g>)}<polyline fill="none" stroke="#357b52" strokeWidth="2.5" points={p.map(x=>`${x.x},${x.y}`).join(' ')}/>{p.map((x,i)=><g key={x.id}><circle cx={x.x} cy={x.y} r="4" fill="#357b52"/><text x={x.x} y={x.y-10} textAnchor="middle" fill="#204b34" fontSize="12">{x.kg} kg</text>{(i===0||i===p.length-1)&&<text x={x.x} y="178" textAnchor="middle" fill="#63756b" fontSize="11">{new Date(x.date+'T12:00:00').toLocaleDateString('es-CO',{day:'numeric',month:'short'})}</text>}</g>)}</svg>
+}

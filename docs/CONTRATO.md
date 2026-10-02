@@ -1,0 +1,13 @@
+# Contrato de datos y transferencia v1
+
+Cada evento contiene `id` único, `entityId`, `kind`, `payload`, `version`, `parentEventId`, `deviceId`, `farmId`, `actor` y fecha UTC `time`. Se conservan las versiones anteriores. El ID del dispositivo receptor no se reemplaza al importar; los IDs de evidencia se mantienen. La interfaz deriva su estado de eventos locales aceptados; una rama recibida cuyo padre no es el evento aceptado no sobrescribe sus cambios posteriores. Conflictos de versión se revisan de forma explícita; resolver conserva las propuestas y crea una versión nueva con `resolvedEventIds` y motivo.
+
+El navegador confirma lectura, validación y escritura en una sola transacción IndexedDB, serializable entre pestañas. Android confirma el JSON operativo en una transacción SQLite; el servicio confirma puntos individuales y diagnósticos en tablas propias. Los puntos nativos se agregan al evento de jornada al finalizar y también se recuperan después de una interrupción. No se permite crear respaldos con una jornada activa para evitar omitir puntos todavía en captura.
+
+Paquete `.finca`: envoltura `format=repelon-encrypted`, `schema=1`, `salt`, `iv`, `checksum`, `body`. Sal aleatoria 16 bytes, IV aleatorio 12 bytes; PBKDF2-HMAC-SHA256 de 250.000 iteraciones y AES-256-GCM. El contenido cifrado contiene finca, modo, fecha y todos sus eventos/fotos. GCM autentica el contenido y el identificador de formato; SHA-256 detecta incongruencia del contenido decodificado. Se exige contraseña de al menos 8 caracteres. Contraseña incorrecta, alteración, versión desconocida, tipos de datos inválidos y otra finca con inventario existente se rechazan antes de escribir. La protección del paquete no acredita identidad individual del emisor.
+
+Los mismos eventos importados conservan un solo ID; una colisión de ID con contenido diferente se rechaza. No se borra el origen ni se marca una exportación como recepción confirmada. Una finca real vacía puede adoptar una copia de otra instalación, preservando sus IDs. Ejemplo y datos reales tienen modos separados. Los archivos nunca activan el GPS al importar.
+
+Presupuesto de datos: 40 MiB por espacio; paquete cifrado hasta 75 MiB para absorber la expansión de Base64. El guardado/exportación comprueba el presupuesto antes de confirmar. La guía recomienda copias frecuentes fuera del dispositivo.
+
+Contrato futuro de servidor: recepción por ID de evento y adjunto, acuse duradero por elemento, fecha de recepción independiente de la ocurrencia, versión y padre de evento, conflictos conservados. HU12 (servidor) y firma del emisor de HU14 quedan diferidas. No se simula una cola enviada o sincronización inexistente.
