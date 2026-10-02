@@ -17,6 +17,8 @@ La versión 0.2.0 simplifica la interfaz para personas mayores: cuatro acciones 
 
 El navegador funciona offline después de completar la primera descarga. Para la jornada con pantalla bloqueada utiliza la APK, que contiene todos sus recursos locales y no requiere conexión.
 
+La página `/guia-promocional/` contiene un video vertical de 71 segundos creado con HyperFrames, una versión ligera para WhatsApp, la guía PDF y las descargas del piloto. La configuración y los pasos para publicar gratuitamente en Vercel están en [docs/VERCEL.md](docs/VERCEL.md). Cambiar de enlace requiere traer una copia protegida de los datos del navegador anterior.
+
 ## Desarrollo y verificación
 
 Requisitos web: Node 22 o 24 y npm. Requisitos Android: JDK 17 o 21 con compilador, SDK plataforma 35 y build-tools 35.0.0.

@@ -1,0 +1,12 @@
+node_modules
+android
+artifacts
+tests
+.git
+.openai
+.impeccable
+.sites-runtime
+*.jks
+*.keystore
+*.password
+.env

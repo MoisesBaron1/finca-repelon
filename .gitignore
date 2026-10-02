@@ -8,3 +8,4 @@ android/local.properties
 artifacts/
 android/app/src/main/assets/
 .env
+.vercel/
