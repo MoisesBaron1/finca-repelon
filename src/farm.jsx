@@ -8,10 +8,14 @@ export const useFarm=()=>useContext(Context);
 export function FarmProvider({children}){
  const [mode,setMode]=useState('demo'),[events,setEvents]=useState([]),[ready,setReady]=useState(false),[toast,setToast]=useState(null),[dialog,setDialog]=useState(null),[page,setPage]=useState(location.hash.slice(1)||'overview'),[online,setOnline]=useState(navigator.onLine),[live,setLive]=useState(null),[fatal,setFatal]=useState('');
  const device=useRef(),watch=useRef(null),sessionRef=useRef(null),toastTimer=useRef();
+ const [largeText,updateLargeText]=useState(false);
+ useEffect(()=>{read('ui.largeText').then(value=>updateLargeText(value===true)).catch(()=>{});},[]);
+ useEffect(()=>{document.documentElement.classList.toggle('larger-text',largeText);},[largeText]);
+ function setLargeText(value){updateLargeText(value);write('ui.largeText',value).catch(()=>notify('No se pudo recordar el tamaño de letra. Puedes elegirlo otra vez al abrir la app.','error'));}
  const state={...emptyState(),...materialize(events)};
  state.sessions=state.sessions.map(s=>s.native?s:{...s,points:[...new Map([...(s.points||[]),...state.points.filter(p=>p.sessionId===s.id)].map(p=>[p.id,p])).values()]});
  const farm=state.settings[0]||{},activeSession=live?.status==='En curso'?live:state.sessions.find(s=>s.status==='En curso'),conflicts=mergeEvents(events,[]).conflicts;
- function notify(message,type='success'){setToast({message,type});clearTimeout(toastTimer.current);toastTimer.current=setTimeout(()=>setToast(null),6000);}
+ function notify(message,type='success'){setToast({message,type});clearTimeout(toastTimer.current);toastTimer.current=setTimeout(()=>setToast(null),12000);}
  function navigate(next){setPage(next);location.hash=next;setDialog(null);}
  useEffect(()=>{function change(){setPage(location.hash.slice(1)||'overview');}function network(){setOnline(navigator.onLine);}window.addEventListener('hashchange',change);window.addEventListener('online',network);window.addEventListener('offline',network);return()=>{window.removeEventListener('hashchange',change);window.removeEventListener('online',network);window.removeEventListener('offline',network);};},[]);
  useEffect(()=>{(async()=>{try{device.current=await deviceId();const selected=await read('mode')||'demo';setMode(selected);setEvents(await loadDataset(selected));setReady(true);}catch(e){setFatal('No se pudo abrir el almacenamiento local. Revisa el espacio disponible y vuelve a abrir la app.');}})();return()=>{if(watch.current!==null)navigator.geolocation.clearWatch(watch.current);};},[]);
@@ -93,6 +97,6 @@ export function FarmProvider({children}){
   poll();const timer=setInterval(poll,3000);return()=>{stopped=true;clearInterval(timer);};
  },[ready,mode]);
  useEffect(()=>{const onExport=e=>notify(e.detail.message,e.detail.ok?'success':'error');window.addEventListener('native-export',onExport);return()=>window.removeEventListener('native-export',onExport);},[]);
- const value={mode,state,events,farm,ready,fatal,toast,setToast,dialog,setDialog,page,navigate,online,save,saveBatch,notify,switchMode,importData,activeSession,startSession,finishSession,live,conflicts};
+ const value={mode,state,events,farm,ready,fatal,toast,setToast,dialog,setDialog,page,navigate,online,save,saveBatch,notify,switchMode,importData,activeSession,startSession,finishSession,live,conflicts,largeText,setLargeText};
  return <Context.Provider value={value}>{children}</Context.Provider>;
 }

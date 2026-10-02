@@ -6,6 +6,8 @@ Gestión local de tareas, palmas y jornadas, ganado, plátano, recursos y movimi
 
 Abre el panel entregado o instala `Finca-Repelon-piloto.apk` en Android 8 o superior. La primera pantalla contiene **datos de ejemplo**. Usa «Datos de ejemplo → Usar mi finca» para empezar con inventarios reales separados.
 
+La versión 0.2.0 simplifica la interfaz para personas mayores: cuatro acciones en Inicio, letras grandes, ayuda integrada, registros por pasos y protección al salir sin guardar. En Ayuda puedes aumentar más el texto; la app recuerda esa elección. El APK mantiene la misma firma e identificador y aumenta versionCode, para poder actualizar la instalación anterior sin desinstalarla.
+
 1. Configura nombre, área y responsables en Datos y ajustes.
 2. Añade palmas manualmente o importa el CSV. Valida coordenadas en terreno.
 3. Registra animales, lotes y recursos. El inventario comienza con movimientos de entrada.

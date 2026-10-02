@@ -1,8 +1,38 @@
 {
   "version": 1,
-  "typography": {"family": "Manrope", "body": "16px", "labels": "14px", "metadata": "12px"},
-  "colors": {"forest": "#123c30", "green": "#2d6746", "lime": "#cee891", "text": "#20382e", "muted": "#63756c", "canvas": "#f5f7f5", "surface": "#ffffff", "border": "#e3e9e4"},
-  "radius": {"surface": "14px", "control": "8px"},
-  "spacing": {"desktopPage": "32px", "mobilePage": "17px", "sectionGap": "23px"},
-  "motion": {"dialog": "200ms ease-out", "reducedMotion": "respected"}
+  "typography": {
+    "family": "Manrope",
+    "body": "18px",
+    "labels": "18px",
+    "metadata": "17px",
+    "largeText": "21px"
+  },
+  "colors": {
+    "forest": "#123c30",
+    "green": "#2d6746",
+    "lime": "#cee891",
+    "text": "#20382e",
+    "muted": "#526158",
+    "canvas": "#f5f7f5",
+    "surface": "#ffffff",
+    "border": "#e3e9e4"
+  },
+  "radius": {
+    "surface": "14px",
+    "control": "8px"
+  },
+  "spacing": {
+    "desktopPage": "32px",
+    "mobilePage": "17px",
+    "sectionGap": "23px"
+  },
+  "motion": {
+    "dialog": "200ms ease-out",
+    "reducedMotion": "respected"
+  },
+  "interaction": {
+    "primaryTouchTarget": "52px",
+    "mobileNavigation": "persistent bottom navigation",
+    "frequentRecords": "guided with review and saved confirmation"
+  }
 }

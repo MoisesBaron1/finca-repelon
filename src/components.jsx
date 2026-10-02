@@ -9,30 +9,64 @@ export function Badge({children,tone}){
 }
 export function Avatar({name='Administrador',small=false}){const initials=name.split(' ').slice(0,2).map(x=>x[0]).join('');return <span className={`avatar ${small?'small':''}`} title={name}>{initials}</span>}
 export function Empty({title='Todavía no hay registros',text='Añade el primer registro para comenzar.',action}){return <div className="empty"><Leaf size={30}/><h3>{title}</h3><p>{text}</p>{action}</div>}
-export function Dialog({title,subtitle,children,onClose,wide=false}){
- const ref=useRef();
- useEffect(()=>{const d=ref.current;d.showModal();const onBack=()=>onClose();window.addEventListener('native-back',onBack);return()=>{window.removeEventListener('native-back',onBack);d.close()};},[]);
- return <dialog ref={ref} className={`dialog ${wide?'wide':''}`} aria-labelledby="dialog-title" onCancel={onClose} onClick={e=>{if(e.target===e.currentTarget)onClose()}}>
- <div className="dialog-head"><div><h2 id="dialog-title">{title}</h2>{subtitle&&<p>{subtitle}</p>}</div><IconButton label="Cerrar" onClick={onClose}><X size={20}/></IconButton></div>
+export function Dialog({title,subtitle,children,onClose,wide=false,closeDisabled=false}){
+ const ref=useRef(),closeRef=useRef();closeRef.current=()=>{if(!closeDisabled)onClose()};
+ useEffect(()=>{const d=ref.current;d.showModal();const onBack=()=>closeRef.current();window.addEventListener('native-back',onBack);return()=>{window.removeEventListener('native-back',onBack);d.close()};},[]);
+ return <dialog ref={ref} className={`dialog ${wide?'wide':''}`} aria-labelledby="dialog-title" onCancel={e=>{e.preventDefault();if(!closeDisabled)onClose()}}>
+ <div className="dialog-head"><div><h2 id="dialog-title">{title}</h2>{subtitle&&<p>{subtitle}</p>}</div><Button variant="secondary" disabled={closeDisabled} onClick={onClose}>Cerrar</Button></div>
  {children}</dialog>
 }
-export function Field({label,name,type='text',options,required=false,defaultValue,help,min,max,step,wide=false}){
+export function Field({label,name,type='text',options,required=false,defaultValue,value,onChange,help,min,max,step,wide=false}){
  const helpId=useId();
+ const control=value!==undefined?{value,onChange}:{defaultValue};
  return <label className={`field ${wide?'full':''}`}><span>{label}{required&&<span className="required" aria-hidden="true"> *</span>}</span>
- {type==='select'?<select aria-label={label} aria-describedby={help?helpId:undefined} name={name} defaultValue={defaultValue??''} required={required}><option value="" disabled>Seleccionar</option>{options?.map(o=><option key={o.value??o} value={o.value??o}>{o.label??o}</option>)}</select>:type==='textarea'?<textarea aria-label={label} aria-describedby={help?helpId:undefined} name={name} rows={3} defaultValue={defaultValue} required={required}/>:<input aria-label={label} aria-describedby={help?helpId:undefined} name={name} type={type} defaultValue={defaultValue} required={required} min={min} max={max} step={step} autoComplete={type==='password'?'new-password':'off'}/>}
+ {type==='select'?<select aria-label={label} aria-describedby={help?helpId:undefined} name={name} {...control} required={required}><option value="" disabled={required}>{required?'Elige una opción':'Sin seleccionar'}</option>{options?.map(o=><option key={o.value??o} value={o.value??o}>{o.label??o}</option>)}</select>:type==='textarea'?<textarea aria-label={label} aria-describedby={help?helpId:undefined} name={name} rows={3} {...control} required={required}/>:<input aria-label={label} aria-describedby={help?helpId:undefined} name={name} type={type} inputMode={type==='number'?'decimal':undefined} {...control} required={required} min={min} max={max} step={step} autoComplete={type==='password'?'new-password':'off'}/>}
  {help&&<small id={helpId}>{help}</small>}</label>
 }
-export function RecordForm({fields,onSubmit,onCancel,values={},children,submitLabel='Guardar registro',photo=false}){
- const [busy,setBusy]=useState(false),[error,setError]=useState(''),[image,setImage]=useState(values.photo||'');
- async function submit(e){e.preventDefault();setBusy(true);setError('');try{const data=Object.fromEntries(new FormData(e.currentTarget));for(const f of fields)if(f.type==='number')data[f.name]=data[f.name]===''?null:Number(data[f.name]);if(image)data.photo=image;await onSubmit(data);}catch(e){setError(e.message||'No se pudo guardar. Inténtalo de nuevo.');}finally{setBusy(false);}}
- async function attach(e){const f=e.target.files[0];if(!f)return;if(f.size>3*1024*1024){setError('La foto debe pesar menos de 3 MB.');return;}if(!['image/jpeg','image/png','image/webp'].includes(f.type)){setError('Usa una foto JPG, PNG o WebP.');return;}const reader=new FileReader();reader.onload=()=>setImage(reader.result);reader.readAsDataURL(f);}
- return <form onSubmit={submit} className="record-form"><div className="form-grid">{fields.map(f=><Field key={f.name} {...f} defaultValue={values[f.name]??f.defaultValue}/>)}{children}
- {photo&&<div className="field full"><span>Foto de evidencia <small>(opcional · hasta 3 MB)</small></span><label className="photo-picker"><ImagePlus size={19}/> {image?'Cambiar foto':'Añadir foto'}<input type="file" accept="image/jpeg,image/png,image/webp" onChange={attach}/></label>{image&&<div className="photo-preview"><img src={image} alt="Evidencia adjunta"/><button type="button" onClick={()=>setImage('')}>Quitar foto</button></div>}</div>}
- </div>{error&&<p className="form-error" role="alert"><AlertCircle size={17}/>{error}</p>}<div className="dialog-foot"><span className="save-note"><Check size={14}/> Guardado en este dispositivo</span><Button type="button" variant="secondary" onClick={onCancel}>Cancelar</Button><Button type="submit" disabled={busy}>{busy?'Guardando…':submitLabel}</Button></div></form>
+export function RecordForm({fields,onSubmit,onCancel,values={},children,submitLabel='Guardar registro',photo=false,steps,onDirtyChange,onBusyChange}){
+ const [busy,setBusy]=useState(false),[error,setError]=useState(''),[image,setImage]=useState(values.photo||''),[step,setStep]=useState(0);
+ const [draft,setDraft]=useState(()=>Object.fromEntries(fields.map(f=>[f.name,values[f.name]??f.defaultValue??''])));
+ const formRef=useRef(),headingRef=useRef(),isReview=!!steps&&step===steps.length;
+ const shown=steps?(steps[step]?.fields||[]).map(name=>fields.find(f=>f.name===name)).filter(Boolean):fields.filter(f=>f.required);
+ const optional=fields.filter(f=>!f.required&&!steps?.some(s=>s.fields.includes(f.name)));
+ useEffect(()=>{if(step>0)headingRef.current?.focus();},[step]);
+ function change(name,value){setDraft(d=>({...d,[name]:value}));onDirtyChange?.(true);setError('');}
+ function validate(){
+  const invalid=formRef.current.querySelector('input:invalid,select:invalid,textarea:invalid');
+  if(!invalid)return true;
+  const field=fields.find(f=>f.name===invalid.name);
+  setError(`Revisa «${field?.label||'este dato'}». ${invalid.validity.valueMissing?'Falta completarlo.':'Usa un valor dentro del rango indicado.'}`);
+  const details=invalid.closest('details');if(details)details.open=true;
+  invalid.focus();invalid.reportValidity();return false;
+ }
+ async function submit(e){
+  e.preventDefault();if(!validate())return;
+  if(steps&&!isReview){setError('');setStep(s=>s+1);return;}
+  setBusy(true);onBusyChange?.(true);setError('');
+  try{const data={...draft};for(const f of fields)if(f.type==='number')data[f.name]=data[f.name]===''?null:Number(data[f.name]);if(image)data.photo=image;await onSubmit(data);}
+  catch(e){setError(e.message||'No se pudo guardar. Tus datos siguen aquí. Intenta otra vez.');}
+  finally{setBusy(false);onBusyChange?.(false);}
+ }
+ async function attach(e){const f=e.target.files[0];if(!f)return;if(f.size>3*1024*1024){setError('Esta foto es muy grande. Elige una de menos de 3 MB.');return;}if(!['image/jpeg','image/png','image/webp'].includes(f.type)){setError('Elige una foto JPG, PNG o WebP.');return;}const reader=new FileReader();reader.onload=()=>{setImage(reader.result);onDirtyChange?.(true);};reader.readAsDataURL(f);}
+ function showValue(f){const value=draft[f.name];if(value===''||value==null)return 'Sin anotar';if(f.type==='select')return f.options?.find(o=>(o.value??o)===value)?.label||value;if(f.type==='date')return new Date(value+'T12:00:00').toLocaleDateString('es-CO',{day:'numeric',month:'long',year:'numeric'});return value;}
+ const renderField=f=><Field key={f.name} {...f} value={draft[f.name]} onChange={e=>change(f.name,e.target.value)}/>;
+ return <form ref={formRef} onSubmit={submit} className="record-form" noValidate>
+ {steps&&<div className="form-step"><p>Paso {step+1} de {steps.length+1}</p><h3 ref={headingRef} tabIndex={-1}>{isReview?'Revisa tu anotación':steps[step].title}</h3><p>{isReview?'Si todo está bien, toca el botón de abajo para guardar.':steps[step].hint||'Completa estos datos y toca Continuar.'}</p></div>}
+ {isReview?<><dl className="record-review">{fields.filter(f=>f.required||draft[f.name]!=='').map(f=><div key={f.name}><dt>{f.label}</dt><dd>{showValue(f)}</dd></div>)}</dl>{image&&<p className="review-photo"><Check size={20}/> Foto incluida</p>}</>:<><p className="required-note">Los datos con * son necesarios.</p><div className="form-grid">{shown.map(renderField)}{children}</div>
+ {(!steps||step===steps.length-1)&&optional.length>0&&<details className="optional-fields"><summary>Añadir otros detalles (opcional)</summary><div className="form-grid">{optional.map(renderField)}</div></details>}
+ {photo&&(!steps||step===steps.length-1)&&<div className="field full photo-field"><span>Foto (opcional)</span><label className="photo-picker"><ImagePlus size={23}/> {image?'Cambiar foto':'Añadir foto'}<input type="file" accept="image/jpeg,image/png,image/webp" onChange={attach}/></label>{image&&<div className="photo-preview"><img src={image} alt="Evidencia adjunta"/><button type="button" onClick={()=>{setImage('');onDirtyChange?.(true)}}>Quitar foto</button></div>}</div>}</>}
+ {error&&<p className="form-error" role="alert"><AlertCircle size={20}/>{error}</p>}
+ <div className="dialog-foot"><p className="save-note">{isReview||!steps?'Se guardará en este teléfono o equipo.':'Todavía no se ha guardado.'}</p><div className="form-buttons"><Button type="button" variant="secondary" disabled={busy} onClick={()=>step>0?(setStep(s=>s-1),setError('')):onCancel()}>{step>0?'Volver al paso anterior':'Salir sin guardar'}</Button><Button type="submit" disabled={busy}>{busy?'Guardando…':steps&&!isReview?'Continuar':submitLabel}</Button></div></div></form>
 }
 
 export function SectionTitle({title,subtitle,action}){return <div className="section-title"><div><h2>{title}</h2>{subtitle&&<p>{subtitle}</p>}</div>{action}</div>}
-export function PageTitle({title,subtitle,children}){return <div className="page-title"><div><h1>{title}</h1>{subtitle&&<p>{subtitle}</p>}</div><div className="page-actions">{children}</div></div>}
+export function PageTitle({title,subtitle,children}){return <div className="page-title"><div><h1 tabIndex={-1}>{title}</h1>{subtitle&&<p>{subtitle}</p>}</div>{children&&<div className="page-actions">{children}</div>}</div>}
+export function ResponsiveTable({children,...props}){
+ const blocks=React.Children.toArray(children),head=blocks.find(x=>x.type==='thead');
+ const text=node=>React.Children.toArray(node).map(x=>typeof x==='string'||typeof x==='number'?x:React.isValidElement(x)?text(x.props.children):'').join('');
+ const headings=head?React.Children.toArray(React.Children.toArray(head.props.children)[0]?.props.children).map(h=>text(h.props.children)):[];
+ return <table {...props} className="responsive-table" role="table">{blocks.map(block=>block.type==='tbody'?React.cloneElement(block,{},React.Children.map(block.props.children,row=>React.isValidElement(row)?React.cloneElement(row,{role:'row'},React.Children.map(row.props.children,(cell,i)=>React.isValidElement(cell)?React.cloneElement(cell,{'data-label':headings[i]||undefined,role:'cell'}):cell)):row)):block)}</table>;
+}
 export function Tabs({items,active,onChange}){return <div className="tabs" role="tablist">{items.map(x=><button key={x.value??x} role="tab" aria-selected={active===(x.value??x)} className={active===(x.value??x)?'active':''} onClick={()=>onChange(x.value??x)}>{x.label??x}{x.count!=null&&<span>{x.count}</span>}</button>)}</div>}
 
 export function FarmMap({palms=[],demo=false,selected,onSelect,compact=false,points=[],label=true}){

@@ -1,20 +1,17 @@
-import React,{useState,useEffect,useRef} from 'react';
-import {LayoutDashboard,ClipboardList,Leaf,Beef,Sprout,Package,ChartNoAxesCombined,Settings2,Search,Bell,ChevronDown,Plus,Menu,X,CheckCircle2,WifiOff,ShieldCheck,MapPin,ArrowUpRight,TriangleAlert,Scale,Database,LogOut} from 'lucide-react';
+import React,{useState,useEffect} from 'react';
+import {House,ClipboardList,Leaf,Beef,Sprout,Package,ChartNoAxesCombined,Settings2,Menu,CheckCircle2,WifiOff,ShieldCheck,MapPin,TriangleAlert,HelpCircle,ArrowLeft,Square,ChevronRight} from 'lucide-react';
 import {FarmProvider,useFarm} from './farm.jsx';
-import {Button,IconButton,Avatar} from './components.jsx';
+import {Button,Dialog} from './components.jsx';
 import Forms from './Forms.jsx';
-import {Overview,Tasks,Palms,Cattle,Banana,Resources,Reports,Settings,alertsFor} from './pages.jsx';
+import {Overview,Tasks,Palms,Cattle,Banana,Resources,Reports,Settings} from './pages.jsx';
 import {isNative} from './storage.mjs';
 
-const navigation=[{id:'overview',name:'Tablero',icon:LayoutDashboard},{id:'tasks',name:'Tareas',icon:ClipboardList},{id:'palms',name:'Palma y jornadas',icon:Leaf},{id:'cattle',name:'Ganado',icon:Beef},{id:'banana',name:'Plátano',icon:Sprout},{id:'resources',name:'Recursos y finanzas',icon:Package},{id:'reports',name:'Informes',icon:ChartNoAxesCombined}];
+const navigation=[{id:'overview',name:'Inicio',icon:House},{id:'tasks',name:'Tareas',icon:ClipboardList},{id:'palms',name:'Palmas y jornadas',icon:Leaf},{id:'cattle',name:'Ganado',icon:Beef},{id:'banana',name:'Plátano',icon:Sprout},{id:'resources',name:'Herramientas y dinero',icon:Package},{id:'reports',name:'Informes',icon:ChartNoAxesCombined}];
 export default function App(){return <FarmProvider><Shell/></FarmProvider>}
 function Shell(){
- const ctx=useFarm(),{page,navigate,state,farm,ready,fatal,mode,setDialog,toast,setToast,online,activeSession}=ctx;
- const [mobileNav,setMobileNav]=useState(false),[search,setSearch]=useState(''),[quick,setQuick]=useState(false),[alertsOpen,setAlertsOpen]=useState(false),searchRef=useRef();
- const alerts=alertsFor(state),title=navigation.find(n=>n.id===page)?.name||'Datos y ajustes';
- const results=search.length>1?[...state.tasks.map(x=>({label:x.name,secondary:x.zone,type:'taskDetail',data:x,icon:ClipboardList})),...state.animals.map(x=>({label:x.name,secondary:x.code,page:'cattle',icon:Beef})),...state.palms.map(x=>({label:x.code,secondary:x.zone,page:'palms',icon:Leaf})),...state.plots.map(x=>({label:x.name,secondary:'Plátano',page:'banana',icon:Sprout}))].filter(x=>`${x.label} ${x.secondary}`.toLowerCase().includes(search.toLowerCase())).slice(0,6):[];
- useEffect(()=>{function key(e){if(e.key==='Escape'){setSearch('');setQuick(false);setAlertsOpen(false);setMobileNav(false);}if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();searchRef.current?.focus();}}window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key)},[]);
- useEffect(()=>{setMobileNav(false);setQuick(false);setAlertsOpen(false);},[page]);
+ const {page,navigate,state,farm,ready,fatal,mode,setDialog,toast,setToast,online,activeSession}=useFarm();
+ const [mobileNav,setMobileNav]=useState(false),title=navigation.find(n=>n.id===page)?.name||'Datos y ajustes';
+ useEffect(()=>{setMobileNav(false);if(ready){window.scrollTo({top:0,behavior:'instant'});document.querySelector('main h1')?.focus({preventScroll:true});}},[page,ready]);
  useEffect(()=>{
   const context=document.modelContext;if(!context?.registerTool||!ready)return;
   const controller=new AbortController();
@@ -22,22 +19,24 @@ function Shell(){
   return()=>controller.abort();
  },[ready,state.tasks.length,mode]);
  if(fatal)return <div className="startup-error"><TriangleAlert size={32}/><h1>No se pudieron abrir tus datos</h1><p>{fatal}</p><Button onClick={()=>location.reload()}>Volver a intentar</Button></div>;
- if(!ready)return <div className="startup"><div className="brand-mark"><Leaf size={28}/></div><h1>Finca Repelón</h1><p>Abriendo tus registros locales…</p></div>;
+ if(!ready)return <div className="startup"><div className="brand-mark"><Leaf size={28}/></div><h1>Finca Repelón</h1><p>Abriendo tus anotaciones…</p></div>;
  const Current=({overview:Overview,tasks:Tasks,palms:Palms,cattle:Cattle,banana:Banana,resources:Resources,reports:Reports,settings:Settings})[page]||Overview;
- function go(next){navigate(next);setMobileNav(false);setSearch('');}
- return <div className="app-shell">
- {mobileNav&&<button className="nav-backdrop" aria-label="Cerrar navegación" onClick={()=>setMobileNav(false)}/>}
- <aside className={`sidebar ${mobileNav?'open':''}`}>
- <button className="brand" onClick={()=>go('overview')} aria-label="Finca Repelón · ir al tablero"><span className="brand-mark"><Leaf size={26}/></span><span><strong>Finca Repelón<span className="brand-period">.</span></strong><small>GESTIÓN DE CAMPO</small></span></button>
- <button className="farm-selector" onClick={()=>setDialog({type:'mode'})}><span className="farm-thumb"><MapPin size={18}/></span><span><strong>{farm.name}</strong><small>{farm.location||'Configura tu finca'}</small></span><ChevronDown size={16}/></button>
- <nav aria-label="Navegación principal">{navigation.map(n=><button key={n.id} aria-label={n.name} className={`nav-item ${page===n.id?'active':''}`} onClick={()=>go(n.id)} aria-current={page===n.id?'page':undefined}><n.icon size={20}/><span>{n.name}</span>{n.id==='tasks'&&state.tasks.filter(t=>t.status==='Por revisar').length>0&&<span className="nav-count" aria-hidden="true">{state.tasks.filter(t=>t.status==='Por revisar').length}</span>}</button>)}</nav>
- <div className="nav-divider"/><button className={`nav-item settings-nav ${page==='settings'?'active':''}`} onClick={()=>go('settings')}><Settings2 size={20}/><span>Datos y ajustes</span></button>
- <div className="sidebar-bottom"><button className="local-status" onClick={()=>setDialog({type:'backup'})}><span className="local-icon"><ShieldCheck size={21}/></span><span><strong>Tus datos, contigo</strong><small>Guardados en este dispositivo</small></span><ChevronRightIcon/></button><div className="profile"><Avatar name="Administrador"/><span><strong>Administrador</strong><small>Equipo local · MVP gratuito</small></span><button aria-label="Abrir ajustes del equipo" onClick={()=>go('settings')}><Settings2 size={17}/></button></div></div>
+ function go(next){navigate(next);setMobileNav(false);}
+ function navigationButtons(){return <>{navigation.map(n=><button key={n.id} aria-label={n.name} className={`nav-item ${page===n.id?'active':''}`} onClick={()=>go(n.id)} aria-current={page===n.id?'page':undefined}><n.icon size={24}/><span>{n.name}</span><ChevronRight size={19}/></button>)}<button className={`nav-item ${page==='settings'?'active':''}`} onClick={()=>go('settings')}><Settings2 size={24}/><span>Datos y ajustes</span><ChevronRight size={19}/></button></>}
+ return <div className="app-shell easy-shell">
+ <a className="skip-link" href="#main-content">Ir al contenido</a>
+ <aside className="sidebar">
+ <button className="brand" onClick={()=>go('overview')} aria-label="Finca Repelón · ir al inicio"><span className="brand-mark"><Leaf size={27}/></span><strong>Finca Repelón</strong></button>
+ <p className="sidebar-farm"><MapPin size={19}/>{farm.name}</p>
+ <nav aria-label="Navegación principal">{navigationButtons()}</nav>
+ <div className="sidebar-bottom"><Button variant="secondary" icon={HelpCircle} onClick={()=>setDialog({type:'help'})}>Ayuda para usar la app</Button><button className="copy-link" onClick={()=>setDialog({type:'backup'})}><ShieldCheck size={24}/><span>Hacer una copia<small>Para conservar tus datos</small></span></button></div>
  </aside>
- <div className="main-shell"><header className="topbar"><div className="topbar-left"><IconButton label="Abrir menú" className="mobile-menu icon-button" onClick={()=>setMobileNav(true)}><Menu size={21}/></IconButton><span className="breadcrumb">Mi finca <span>/</span> <strong>{title}</strong></span></div><div className="topbar-right"><div className="global-search"><Search size={17}/><input ref={searchRef} aria-label="Buscar en la finca" placeholder="Buscar en la finca…" value={search} onChange={e=>setSearch(e.target.value)}/><kbd>⌘ K</kbd>{search.length>1&&<div className="search-results">{results.length?results.map((r,i)=><button key={i} onClick={()=>{if(r.type)setDialog({type:r.type,data:r.data});else go(r.page);setSearch('');}}><r.icon size={17}/><span><strong>{r.label}</strong><small>{r.secondary}</small></span></button>):<p>No hay registros con ese nombre.</p>}</div>}</div><button className={`example-tag ${mode==='real'?'real':''}`} onClick={()=>setDialog({type:'mode'})}>{mode==='demo'?'Datos de ejemplo':'Mi finca'}<ChevronDown size={12}/></button><div className="alert-dropdown"><IconButton label={`Alertas pendientes: ${alerts.length}`} onClick={()=>{setAlertsOpen(x=>!x);setQuick(false);}}><Bell size={19}/>{alerts.length>0&&<span className="notification-dot"/>}</IconButton>{alertsOpen&&<div className="dropdown notifications"><h3>Necesita atención</h3>{alerts.length?alerts.slice(0,5).map(a=><button key={a.id} onClick={()=>{a.action?setDialog({type:a.action,data:a.data}):go(a.page);setAlertsOpen(false)}}><TriangleAlert size={17}/><span><strong>{a.title}</strong><small>{a.text}</small></span></button>):<p>Sin alertas pendientes.</p>}</div>}</div><div className="quick-action"><Button icon={Plus} onClick={()=>{setQuick(x=>!x);setAlertsOpen(false)}}>Nuevo registro</Button>{quick&&<div className="dropdown"><h3>Registrar en la finca</h3>{[['task','Nueva tarea',ClipboardList],['incident','Incidencia',TriangleAlert],['weight','Pesaje de ganado',Scale],['harvest','Cosecha de plátano',Sprout],['finance','Gasto o ingreso',Package]].map(([type,label,Icon])=><button key={type} onClick={()=>{setDialog({type});setQuick(false)}}><Icon size={17}/>{label}</button>)}</div>}</div></div></header>
- {!online&&<div className="network-banner"><WifiOff size={16}/> Estás sin conexión. Puedes seguir registrando en este dispositivo.</div>}
- <main><Current search={search}/><footer className="main-footer"><span><Leaf size={14}/> Finca Repelón · Crecer también es cuidar.</span><span><Database size={13}/> {isNative()?'Android · SQLite local':'Datos locales'} · Sin suscripción</span></footer></main></div>
- <Forms/>{toast&&<div className={`toast ${toast.type}`} role={toast.type==='error'?'alert':'status'}>{toast.type==='error'?<TriangleAlert size={20}/>:<CheckCircle2 size={20}/>}<span>{toast.message}</span><IconButton label="Cerrar aviso" onClick={()=>setToast(null)}><X size={17}/></IconButton></div>}
+ <div className="main-shell"><header className="topbar"><div className="topbar-left">{page==='overview'?<span className="current-location"><House size={24}/>Inicio</span>:<Button variant="secondary" icon={ArrowLeft} onClick={()=>go('overview')}>Volver al inicio</Button>}<span className="current-page">{page!=='overview'&&title}</span></div><div className="topbar-right"><button className={`example-tag ${mode==='real'?'real':''}`} onClick={()=>setDialog({type:'mode'})}>{mode==='demo'?'Datos de ejemplo':'Mi finca'}<ChevronRight size={19}/></button><Button variant="secondary" icon={HelpCircle} className="desktop-help" onClick={()=>setDialog({type:'help'})}>Ayuda</Button></div></header>
+ {!online&&<div className="network-banner" role="status"><WifiOff size={23}/>Sin internet. Puedes seguir anotando: los datos se guardan aquí.</div>}
+ {activeSession&&<div className="ongoing-journey"><span className="live-dot"/><div><strong>Tu jornada está en marcha</strong><span>{activeSession.workerName} · {activeSession.zone}</span></div><Button variant="secondary" icon={Square} onClick={()=>setDialog({type:'finishSession'})}>Finalizar jornada</Button></div>}
+ <main id="main-content" tabIndex={-1}><Current/><footer className="main-footer"><span><ShieldCheck size={18}/>Tus datos se guardan en este {isNative()?'teléfono':'equipo'}.</span><span>Gratis · sin suscripción</span></footer></main></div>
+ <nav className="mobile-bottom-nav" aria-label="Accesos rápidos"><button aria-label="Inicio" aria-current={page==='overview'?'page':undefined} onClick={()=>go('overview')}><House size={25}/><span>Inicio</span></button><button aria-label="Tareas" aria-current={page==='tasks'?'page':undefined} onClick={()=>go('tasks')}><ClipboardList size={25}/><span>Tareas</span></button><button onClick={()=>setMobileNav(true)}><Menu size={25}/><span>Más opciones</span></button><button onClick={()=>setDialog({type:'help'})}><HelpCircle size={25}/><span>Ayuda</span></button></nav>
+ {mobileNav&&<Dialog title="Más opciones de la finca" onClose={()=>setMobileNav(false)}><nav className="mobile-all-options" aria-label="Navegación principal">{navigationButtons()}<button className="nav-item" onClick={()=>{setMobileNav(false);setDialog({type:'backup'})}}><ShieldCheck size={24}/><span>Hacer una copia</span><ChevronRight size={19}/></button></nav></Dialog>}
+ <Forms/>{toast&&<div className={`toast ${toast.type}`} role={toast.type==='error'?'alert':'status'}>{toast.type==='error'?<TriangleAlert size={24}/>:<CheckCircle2 size={24}/>}<span>{toast.message}</span><button className="toast-dismiss" onClick={()=>setToast(null)}>Entendido</button></div>}
  </div>;
 }
-function ChevronRightIcon(){return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 5 7 7-7 7"/></svg>}
