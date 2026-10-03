@@ -67,7 +67,7 @@ export function ResponsiveTable({children,...props}){
  const headings=head?React.Children.toArray(React.Children.toArray(head.props.children)[0]?.props.children).map(h=>text(h.props.children)):[];
  return <table {...props} className="responsive-table" role="table">{blocks.map(block=>block.type==='tbody'?React.cloneElement(block,{},React.Children.map(block.props.children,row=>React.isValidElement(row)?React.cloneElement(row,{role:'row'},React.Children.map(row.props.children,(cell,i)=>React.isValidElement(cell)?React.cloneElement(cell,{'data-label':headings[i]||undefined,role:'cell'}):cell)):row)):block)}</table>;
 }
-export function Tabs({items,active,onChange}){return <div className="tabs" role="tablist">{items.map(x=><button key={x.value??x} role="tab" aria-selected={active===(x.value??x)} className={active===(x.value??x)?'active':''} onClick={()=>onChange(x.value??x)}>{x.label??x}{x.count!=null&&<span>{x.count}</span>}</button>)}</div>}
+export function Tabs({items,active,onChange}){return <div className="tabs" role="tablist">{items.map(x=><button key={x.value??x} role="tab" aria-selected={active===(x.value??x)} className={active===(x.value??x)?'active':''} onClick={()=>onChange(x.value??x)}>{x.label??x.value??x}{x.count!=null&&<span>{x.count}</span>}</button>)}</div>}
 
 export function FarmMap({palms=[],demo=false,selected,onSelect,compact=false,points=[],label=true}){
  const [zoom,setZoom]=useState(1),[layer,setLayer]=useState('Todas');

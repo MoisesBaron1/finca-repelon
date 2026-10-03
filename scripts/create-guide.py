@@ -26,7 +26,7 @@ def text(value, note=False): story.append(Paragraph(value, styles['GuideNote' if
 def next_page(): story.append(PageBreak())
 
 title('Finca Repelón<br/>Guía para empezar')
-text('Versión 0.2.0 · Uso gratuito')
+text('Versión 0.2.1 · Uso gratuito')
 heading('Primero, elige tus datos')
 text('La primera pantalla tiene datos de ejemplo. Puedes practicar con ellos.')
 text('Para empezar de verdad, toca «Empezar con mi finca» y luego «Usar mi finca». Los datos de prueba quedan aparte.')
@@ -78,7 +78,7 @@ text('El GPS no comprueba que una tarea esté hecha. La precisión y la duració
 
 output = root/'public/downloads/Guia-Finca-Repelon.pdf'
 output.parent.mkdir(parents=True, exist_ok=True)
-doc = SimpleDocTemplate(str(output), pagesize=(595.28,841.89), leftMargin=52, rightMargin=52, topMargin=48, bottomMargin=50, title='Finca Repelón - Guía de uso fácil 0.2.0', author='Finca Repelón')
+doc = SimpleDocTemplate(str(output), pagesize=(595.28,841.89), leftMargin=52, rightMargin=52, topMargin=48, bottomMargin=50, title='Finca Repelón - Guía de uso fácil 0.2.1', author='Finca Repelón')
 def footer(canvas, doc):
     canvas.setFont(family, 11)
     canvas.setFillColor(HexColor('#405246'))

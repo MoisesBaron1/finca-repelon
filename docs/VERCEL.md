@@ -16,6 +16,8 @@ Abre la URL oficial de inicio de sesión que muestre el primer comando. Usa el p
 
 La carpeta `.vercel` queda fuera de Git. Las credenciales de Vercel y las claves de firma Android no se incluyen en el repositorio ni en los archivos para publicar. `.vercelignore` excluye Android, pruebas, artefactos y configuración privada de Sites.
 
+Si aún no hay una sesión de CLI, Vercel 62.2.0 también permite `npx --yes vercel@62.2.0 deploy --temporary --yes --prod`. Genera una publicación pública de 60 minutos y un enlace oficial para guardar el proyecto en la cuenta del propietario. Es imprescindible completar ese paso para conservar el sitio. La configuración privada de esta modalidad se guarda en `.vercel/anonymous.json`; tampoco debe compartirse.
+
 ## Revisar el resultado
 
 1. Confirma que el despliegue termina en estado READY y que el dominio de producción funciona.

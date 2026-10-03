@@ -8,6 +8,12 @@ Verificación realizada: compilación Vite y generación del service worker; acc
 
 ## Estado de publicación
 
-Vercel: pendiente de completar el inicio de sesión oficial del propietario. El conector conectado permite listar el equipo moi, pero su llamada de despliegue devuelve `Tool deploy_to_vercel not found`. La CLI oficial solicita autorización mediante un enlace de dispositivo. No se ha creado ni confirmado un despliegue Vercel, y no se inventa una URL de producción.
+La app ya está publicada mediante la CLI oficial Vercel 62.2.0, con `deploy --temporary --yes --prod`, en https://temporary-spry-jasper-gs4cyvp.vercel.app. La guía está en https://temporary-spry-jasper-gs4cyvp.vercel.app/guia-promocional/. Se comprobaron las respuestas públicas HTTP 200 de la app, la guía, el PDF y el video; la guía también pasó las pruebas de navegador con reproducción H.264/AAC.
+
+El proyecto temporal es `prj_tSVKN4aLJnlAKzgIftqXs2dtPVjD`. Vercel confirmó que el proyecto fue reclamado al intentar publicar la actualización: «This project was claimed successfully». El enlace inicial sigue respondiendo HTTP 200. Falta autorizar la CLI para comprobar la cuenta propietaria y subir la versión corregida; el conector no encuentra el proyecto en su equipo conectado.
+
+La versión 0.2.1, preparada y verificada localmente, corrige una pantalla en blanco al abrir Informes, causada por la etiqueta de las pestañas con contadores, y muestra en español los tipos del historial. Se incorporó una prueba de regresión. La APK actualizada conserva la firma y aumenta versionCode a 3.
+
+El conector sigue devolviendo `Tool deploy_to_vercel not found` y el inicio de sesión mediante dispositivo aún no generó una sesión de CLI. La publicación temporal oficial permitió entregar un enlace real y revisable. La actualización 0.2.1 permanece pendiente de esa autorización de CLI.
 
 La publicación existente de Sites permanece sin cambios. Al usar una nueva dirección, el administrador debe traer una copia protegida de los datos del navegador anterior.

@@ -9,3 +9,4 @@ artifacts/
 android/app/src/main/assets/
 .env
 .vercel/
+.vercel

@@ -8,6 +8,8 @@ Abre el panel entregado o instala `Finca-Repelon-piloto.apk` en Android 8 o supe
 
 La versión 0.2.0 simplifica la interfaz para personas mayores: cuatro acciones en Inicio, letras grandes, ayuda integrada, registros por pasos y protección al salir sin guardar. En Ayuda puedes aumentar más el texto; la app recuerda esa elección. El APK mantiene la misma firma e identificador y aumenta versionCode, para poder actualizar la instalación anterior sin desinstalarla.
 
+La versión 0.2.1 corrige la apertura de Informes y traduce los tipos del historial al español. Incluye la APK actualizada con versionCode 3 y la misma firma del piloto.
+
 1. Configura nombre, área y responsables en Datos y ajustes.
 2. Añade palmas manualmente o importa el CSV. Valida coordenadas en terreno.
 3. Registra animales, lotes y recursos. El inventario comienza con movimientos de entrada.

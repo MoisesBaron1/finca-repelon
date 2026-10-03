@@ -1,15 +1,15 @@
-# Verificación de la entrega · 2 de octubre de 2026
+# Verificación de la entrega · 3 de octubre de 2026
 
-Versión Android `0.2.0-piloto`, applicationId `co.repelon.finca`, versionCode 2, Android 8+ (API 26), target API 35.
+Versión Android `0.2.1-piloto`, applicationId `co.repelon.finca`, versionCode 3, Android 8+ (API 26), target API 35.
 
 ## Comprobaciones realizadas
 
 - `npm test`: 17 pruebas aprobadas; ninguna omitida. Cubren atribución conservadora por palma, ambigüedad, huecos/reinicios, precisión, puntos antiguos/simulados, requisitos del piloto, pesajes compatibles, balance de recursos, idempotencia, ramas y resolución de conflictos, esquema de importación, CSV y cifrado autenticado.
 - `npm run build`: compilación de producción satisfactoria. Recursos y tipografías locales; caché offline generada.
-- `npm run test:browser`: once grupos de comprobación aprobados en Chromium. Inicio simplificado; registros por pasos; validación y foco del error; revisión antes de guardar; retroceso sin pérdida de datos; protección al cerrar, incluido el botón Atrás nativo; confirmación de guardado; revisión manual con evidencia; escrituras simultáneas desde dos pestañas; métodos de pesaje; unidades de cosecha separadas; copia/importación protegida; inicio y fin explícito de jornada en navegador; recarga y escritura sin conexión; separación de datos reales y de ejemplo; navegación móvil; aumento de letra persistente y adaptación a 320, 390 y 720 px sin desbordamiento ni errores JavaScript.
+- `npm run test:browser`: doce grupos de comprobación aprobados en Chromium. Inicio simplificado; registros por pasos; validación y foco del error; revisión antes de guardar; retroceso sin pérdida de datos; protección al cerrar, incluido el botón Atrás nativo; confirmación de guardado; apertura de Informes y pestañas con contadores, e historial en español; revisión manual con evidencia; escrituras simultáneas desde dos pestañas; métodos de pesaje; unidades de cosecha separadas; copia/importación protegida; inicio y fin explícito de jornada en navegador; recarga y escritura sin conexión; separación de datos reales y de ejemplo; navegación móvil; aumento de letra persistente y adaptación a 320, 390 y 720 px sin desbordamiento ni errores JavaScript.
 - Axe, reglas WCAG A/AA: sin incidencias en Inicio de escritorio, revisión de tarea, Inicio móvil, revisión de pesaje móvil y lista de ganado móvil. Es una comprobación automática de esos estados, no una certificación de accesibilidad de toda la aplicación.
 - Inspección visual en 1440 px y 390 px. Las tablas amplias tienen desplazamiento propio.
-- Revisión independiente de la entrega inicial: correcciones confirmadas para concurrencia, conflictos entre ramas y validación de paquetes. Las reglas se conservan y las 17 pruebas se ejecutaron de nuevo en 0.2.0.
+- Revisión independiente de la entrega inicial: correcciones confirmadas para concurrencia, conflictos entre ramas y validación de paquetes. Las reglas se conservan y las 17 pruebas se ejecutaron de nuevo en 0.2.1.
 - Android `:app:assembleRelease`: satisfactorio, incluyendo `lintVitalAnalyzeRelease` y `lintVitalRelease`, sin desactivar comprobaciones.
 - APK alineada y firmada con una clave exclusiva del piloto. `apksigner verify --verbose`: válida con esquemas v2 y v3, un firmante.
 - Se comprobó que el certificado coincide con el de la versión anterior. Se mantiene el identificador, se aumenta versionCode y no se cambia el esquema SQLite. No se probó la instalación de la actualización en un dispositivo físico.
@@ -19,7 +19,7 @@ Versión Android `0.2.0-piloto`, applicationId `co.repelon.finca`, versionCode 2
 SHA-256 de `Finca-Repelon-piloto.apk`:
 
 ```text
-a4e89df42fdfb6cae9383925226f280158fccb797b3e526377ae4aa9f45d5605
+69a2d12c485a38702b743540219b119ac664a2e0026301fbf8ee948d1fdb7860
 ```
 
 ## Validación pendiente en campo

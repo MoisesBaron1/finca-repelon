@@ -3,6 +3,7 @@ android
 artifacts
 tests
 .git
+.vercel
 .openai
 .impeccable
 .sites-runtime

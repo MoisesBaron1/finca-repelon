@@ -6,7 +6,9 @@ import {readFileSync,mkdirSync} from 'node:fs';
 const base=process.env.APP_URL||'http://127.0.0.1:5173';
 // El Chromium del sistema incluye H.264/AAC; algunas compilaciones de Playwright no.
 const executablePath=process.env.PROMO_BROWSER_PATH||'/usr/bin/chromium';
-const browser=await chromium.launch({executablePath,headless:true,args:['--no-sandbox']});
+const proxyUrl=process.env.HTTPS_PROXY||process.env.HTTP_PROXY;
+const proxy=proxyUrl&&!['localhost','127.0.0.1'].includes(new URL(base).hostname)?{server:proxyUrl,bypass:'localhost,127.0.0.1'}:undefined;
+const browser=await chromium.launch({executablePath,headless:true,args:['--no-sandbox'],proxy});
 try{
  const context=await browser.newContext({viewport:{width:1280,height:900},locale:'es-CO'});
  const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
