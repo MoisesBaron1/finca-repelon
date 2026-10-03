@@ -6,14 +6,16 @@ La versión para WhatsApp mide aproximadamente 2,2 MB y está disponible en `pub
 
 Verificación realizada: compilación Vite y generación del service worker; accesibilidad WCAG AA de la página de promoción; adaptación a 320/390/1280 px; cuatro descargas completas y reproducción H.264/AAC en Chromium del sistema. La configuración de Vercel está en `vercel.json` y el procedimiento en `docs/VERCEL.md`.
 
-## Estado de publicación
+## Publicación confirmada · 3 de octubre de 2026
 
-La app ya está publicada mediante la CLI oficial Vercel 62.2.0, con `deploy --temporary --yes --prod`, en https://temporary-spry-jasper-gs4cyvp.vercel.app. La guía está en https://temporary-spry-jasper-gs4cyvp.vercel.app/guia-promocional/. Se comprobaron las respuestas públicas HTTP 200 de la app, la guía, el PDF y el video; la guía también pasó las pruebas de navegador con reproducción H.264/AAC.
+- App: https://temporary-spry-jasper-gs4cyvp.vercel.app
+- Guía promocional: https://temporary-spry-jasper-gs4cyvp.vercel.app/guia-promocional/
+- PDF: https://temporary-spry-jasper-gs4cyvp.vercel.app/downloads/Guia-Promocional-Finca-Repelon.pdf
 
-El proyecto temporal es `prj_tSVKN4aLJnlAKzgIftqXs2dtPVjD`. Vercel confirmó que el proyecto fue reclamado al intentar publicar la actualización: «This project was claimed successfully». El enlace inicial sigue respondiendo HTTP 200. Falta autorizar la CLI para comprobar la cuenta propietaria y subir la versión corregida; el conector no encuentra el proyecto en su equipo conectado.
+El proyecto `prj_tSVKN4aLJnlAKzgIftqXs2dtPVjD` está guardado en el equipo `moi` (`moi-83ef`). La CLI oficial Vercel 62.2.0 confirmó el despliegue de producción `dpl_7NB5gV3zPrBqtEbEusNjjvmQ4VeT` en estado READY. La versión 0.2.1 se publicó mediante `deploy --prod --yes --scope moi-83ef`.
 
-La versión 0.2.1, preparada y verificada localmente, corrige una pantalla en blanco al abrir Informes, causada por la etiqueta de las pestañas con contadores, y muestra en español los tipos del historial. Se incorporó una prueba de regresión. La APK actualizada conserva la firma y aumenta versionCode a 3.
+La versión publicada corrige la pantalla en blanco al abrir Informes y muestra en español los tipos del historial. La APK disponible conserva la firma del piloto y aumenta versionCode a 3. El PDF promocional incluye el enlace real de la app.
 
-El conector sigue devolviendo `Tool deploy_to_vercel not found` y el inicio de sesión mediante dispositivo aún no generó una sesión de CLI. La publicación temporal oficial permitió entregar un enlace real y revisable. La actualización 0.2.1 permanece pendiente de esa autorización de CLI.
+Las pruebas sobre la dirección pública, sin iniciar sesión en Vercel, confirmaron: cuatro acciones grandes en Inicio; interfaz en español con un navegador configurado en inglés; apertura de Informes e historial traducido; guardado y recarga sin conexión; guía sin desbordamiento a 320/390/1280 px; accesibilidad WCAG AA de la guía; cuatro descargas y reproducción real H.264/AAC del video. Se compararon los archivos publicados con los locales para verificar la APK y el PDF final.
 
-La publicación existente de Sites permanece sin cambios. Al usar una nueva dirección, el administrador debe traer una copia protegida de los datos del navegador anterior.
+Las credenciales de Vercel, los archivos `.env*`, la carpeta `.vercel` y las claves Android quedan excluidos del repositorio y de la subida. Si se cambia de teléfono, navegador o dirección web, se deben recuperar las anotaciones mediante una copia protegida.

@@ -4,6 +4,8 @@ Gestión local de tareas, palmas y jornadas, ganado, plátano, recursos y movimi
 
 ## Probar
 
+La app está publicada en [Vercel](https://temporary-spry-jasper-gs4cyvp.vercel.app). La [guía promocional](https://temporary-spry-jasper-gs4cyvp.vercel.app/guia-promocional/) reúne el video de HyperFrames, el PDF y las descargas Android.
+
 Abre el panel entregado o instala `Finca-Repelon-piloto.apk` en Android 8 o superior. La primera pantalla contiene **datos de ejemplo**. Usa «Datos de ejemplo → Usar mi finca» para empezar con inventarios reales separados.
 
 La versión 0.2.0 simplifica la interfaz para personas mayores: cuatro acciones en Inicio, letras grandes, ayuda integrada, registros por pasos y protección al salir sin guardar. En Ayuda puedes aumentar más el texto; la app recuerda esa elección. El APK mantiene la misma firma e identificador y aumenta versionCode, para poder actualizar la instalación anterior sin desinstalarla.

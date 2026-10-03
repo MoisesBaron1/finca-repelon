@@ -8,13 +8,13 @@ Necesitas iniciar sesión en la cuenta Vercel que alojará el proyecto. Con Verc
 
 ```bash
 npx --yes vercel@62.2.0 login
-npx --yes vercel@62.2.0 link --yes --project finca-repelon --scope moi-83ef
+npx --yes vercel@62.2.0 link --yes --project prj_tSVKN4aLJnlAKzgIftqXs2dtPVjD --scope moi-83ef
 npx --yes vercel@62.2.0 deploy --prod --yes --scope moi-83ef
 ```
 
 Abre la URL oficial de inicio de sesión que muestre el primer comando. Usa el plan gratuito disponible en la cuenta y el dominio vercel.app incluido; no es necesario comprar un dominio ni activar servicios externos. Si necesitas otra cuenta, reemplaza `--scope` por su equipo.
 
-La carpeta `.vercel` queda fuera de Git. Las credenciales de Vercel y las claves de firma Android no se incluyen en el repositorio ni en los archivos para publicar. `.vercelignore` excluye Android, pruebas, artefactos y configuración privada de Sites.
+La carpeta `.vercel` y todos los archivos `.env*` quedan fuera de Git y de la subida a Vercel. Las credenciales de Vercel y las claves de firma Android no se incluyen en el repositorio ni en los archivos para publicar. `.vercelignore` también excluye Android, pruebas, artefactos y configuración privada de Sites.
 
 Si aún no hay una sesión de CLI, Vercel 62.2.0 también permite `npx --yes vercel@62.2.0 deploy --temporary --yes --prod`. Genera una publicación pública de 60 minutos y un enlace oficial para guardar el proyecto en la cuenta del propietario. Es imprescindible completar ese paso para conservar el sitio. La configuración privada de esta modalidad se guarda en `.vercel/anonymous.json`; tampoco debe compartirse.
 

@@ -15,6 +15,7 @@ Versión Android `0.2.1-piloto`, applicationId `co.repelon.finca`, versionCode 3
 - Se comprobó que el certificado coincide con el de la versión anterior. Se mantiene el identificador, se aumenta versionCode y no se cambia el esquema SQLite. No se probó la instalación de la actualización en un dispositivo físico.
 - Comparación binaria: el HTML y cada recurso de la APK coinciden con la compilación web final.
 - Inspección del manifiesto compilado: no solicita permiso de Internet. GPS y datos privados funcionan con recursos locales.
+- Publicación de producción en Vercel: estado READY. Las pruebas públicas confirmaron español con navegador en inglés, apertura de Informes, historial traducido, recarga y guardado sin conexión. La guía pasó WCAG AA y adaptación a 320/390/1280 px; sus cuatro descargas y el video H.264/AAC funcionan sin sesión Vercel.
 
 SHA-256 de `Finca-Repelon-piloto.apk`:
 
