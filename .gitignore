@@ -7,6 +7,7 @@ android/local.properties
 *.keystore
 artifacts/
 android/app/src/main/assets/
-.env
+.env*
 .vercel/
 .vercel
+.env*

@@ -10,4 +10,4 @@ tests
 *.jks
 *.keystore
 *.password
-.env
+.env*
