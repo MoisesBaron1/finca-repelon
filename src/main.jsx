@@ -1,3 +1,4 @@
+import './compat.mjs';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import '@fontsource/manrope/latin-400.css';

@@ -16,6 +16,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .field>span{font-weight:700}.field small{font-size:.9rem!important;color:var(--muted)!important}
 .field input,.field select,.field textarea{font-size:1rem;min-height:56px;border:1px solid #8d9f93;border-radius:8px;padding:13px 14px;max-width:100%;width:100%;color:#20382e}
 .field textarea{min-height:116px}.field input::placeholder{color:#526158}
+.field input:disabled,.field select:disabled,.field textarea:disabled{background:#eef2ed;color:#46574b}
+.action-error{display:block;flex-basis:100%;max-width:65ch;white-space:normal;overflow-wrap:anywhere;color:#8d3029;background:#fef2eb;border-radius:8px;padding:14px 16px;font-size:1rem;line-height:1.6}
+.dialog-foot{flex-wrap:wrap}.form-buttons{display:flex;gap:12px;flex-wrap:wrap}
+.photo-preview button{min-height:52px;font-size:1rem;padding:8px 12px;text-underline-offset:4px}
+.photo-picker input{min-height:52px}.photo-field>small{color:var(--muted);font-weight:400}
+.password-visibility{display:flex;align-items:center;gap:14px;min-height:56px;margin:14px 0;font-size:1rem;cursor:pointer}.password-visibility input{width:24px;height:24px;accent-color:#2d6746}
+.dialog-head>div{min-width:0}.dialog-head h2,.detail-content h2,.detail-content p,.task-card-content strong,.incident-item p,.health-item p,.plot-title h2,.saved-summary{overflow-wrap:anywhere}
+.dialog{max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px)}
 .form-grid{grid-template-columns:1fr;gap:22px}.field.full{grid-column:1}
 .field select{padding-right:35px}.required{color:#a1332e}
 .page-title{align-items:flex-start;margin-bottom:26px}.page-title p{font-size:1rem;line-height:1.6}.page-actions{flex-wrap:wrap;justify-content:flex-end}

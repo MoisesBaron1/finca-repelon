@@ -3,7 +3,9 @@ import AxeBuilder from '@axe-core/playwright';
 import assert from 'node:assert/strict';
 import {mkdir} from 'node:fs/promises';
 await mkdir('artifacts',{recursive:true});
-const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+const base=process.env.BASE_URL||'http://127.0.0.1:5173/';
+const proxyUrl=/^https:/.test(base)&&(process.env.HTTPS_PROXY||process.env.HTTP_PROXY);
+const browser=await chromium.launch({headless:true,args:['--no-sandbox'],proxy:proxyUrl?{server:proxyUrl}:undefined});
 const context=await browser.newContext({viewport:{width:1440,height:1100},geolocation:{latitude:10.495,longitude:-75.125,accuracy:3},permissions:['geolocation'],acceptDownloads:true,locale:'es-CO'});
 const page=await context.newPage(),errors=[];
 page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(10000);
@@ -34,7 +36,7 @@ async function accessibility(p,surface){
  const result=await new AxeBuilder({page:p}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
  assert.deepEqual(result.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)})),[],`Accessibility violations on ${surface}`);
 }
-await page.goto('http://127.0.0.1:5173/');await home(page).waitFor();
+await page.goto(base);await home(page).waitFor();
 assert.equal(await page.locator('.home-action').count(),4);
 assert.ok(await page.locator('.home-action').evaluateAll(nodes=>nodes.every(n=>n.getBoundingClientRect().height>=52)));
 await accessibility(page,'home');
@@ -69,7 +71,7 @@ await page.getByRole('button',{name:'Revisar labor',exact:true}).click();
 await page.getByLabel('Evidencia de inspección o motivo de corrección').fill('Inspección física de prueba.');
 await finishSave(page,'Guardar revisión','Revisión guardada');
 console.log('PASS manual verification with evidence');
-const second=await context.newPage();await second.goto('http://127.0.0.1:5173/#tasks');await second.getByRole('heading',{name:'Tareas de la finca'}).waitFor();
+const second=await context.newPage();await second.goto(base+'#tasks');await second.getByRole('heading',{name:'Tareas de la finca'}).waitFor();
 for(const [p,name] of [[page,'Edición en pestaña A'],[second,'Edición en pestaña B']]){
  await p.getByRole('button',{name:'Nueva tarea',exact:true}).click();await reviewForm(p,{name,module:'General',zone:'Prueba de concurrencia',personId:'u1'});
 }
@@ -142,7 +144,7 @@ await page.locator('dialog').waitFor({state:'hidden'});await home(page).waitFor(
 console.log('PASS real workspace separated from example records');
 const mobile=await browser.newContext({viewport:{width:390,height:844},isMobile:true,deviceScaleFactor:1,locale:'es-CO'});
 const phone=await mobile.newPage();phone.on('pageerror',e=>errors.push(e.message));
-await phone.goto('http://127.0.0.1:5173/');await home(phone).waitFor();
+await phone.goto(base);await home(phone).waitFor();
 assert.ok(await phone.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
 await accessibility(phone,'mobile home');await screenshot(phone,'artifacts/mobile.png');
 await phone.getByRole('button',{name:'Anotar un dato',exact:false}).click();await phone.getByRole('button',{name:'Anotar peso de ganado',exact:false}).click();

@@ -10,7 +10,7 @@ Abre el panel entregado o instala `Finca-Repelon-piloto.apk` en Android 8 o supe
 
 La versión 0.2.0 simplifica la interfaz para personas mayores: cuatro acciones en Inicio, letras grandes, ayuda integrada, registros por pasos y protección al salir sin guardar. En Ayuda puedes aumentar más el texto; la app recuerda esa elección. El APK mantiene la misma firma e identificador y aumenta versionCode, para poder actualizar la instalación anterior sin desinstalarla.
 
-La versión 0.2.1 corrige la apertura de Informes y traduce los tipos del historial al español. Incluye la APK actualizada con versionCode 3 y la misma firma del piloto.
+La versión 0.3.0 amplía los formularios por pasos, guía el primer animal, lote o recurso y permite corregir pesajes, cosechas e inventario sin duplicarlos. Protege cambios simultáneos y copias de otras fincas, reduce las fotos y mejora la compatibilidad con teléfonos antiguos. La APK conserva la firma del piloto y usa versionCode 4.
 
 1. Configura nombre, área y responsables en Datos y ajustes.
 2. Añade palmas manualmente o importa el CSV. Valida coordenadas en terreno.
@@ -31,7 +31,6 @@ Requisitos web: Node 22 o 24 y npm. Requisitos Android: JDK 17 o 21 con compilad
 npm ci
 npm test
 npm run build
-node scripts/create-sw.mjs
 npm run dev
 ```
 
@@ -41,6 +40,8 @@ Los tests de navegador necesitan servir la compilación en `http://127.0.0.1:517
 npx playwright install chromium
 python -m http.server 5173 --directory dist
 npm run test:browser
+npm run test:hardening
+npm run test:compatibility
 ```
 
 La APK se construye con los recursos ya compilados. Desde la raíz:
@@ -57,7 +58,10 @@ Define `ANDROID_HOME` o crea `android/local.properties` con `sdk.dir=/ruta/al/an
 
 - `src/domain.mjs`: reglas GPS conservadoras, pesos, unidades, eventos/versiones y CSV.
 - `src/storage.mjs`: transacciones IndexedDB, puente SQLite y copias AES-GCM/PBKDF2 con SHA-256.
-- `src/farm.jsx`: acciones compartidas, historial, inicio/final y recepción local.
+- `src/records.mjs`: reglas de guardado e importación dentro de la transacción.
+- `src/farm.jsx`: acciones compartidas, historial, inicio/final y actualización entre pestañas.
+- `src/compat.mjs`: compatibilidad con métodos ausentes en WebViews antiguos.
+- `src/exports.mjs`: informes CSV con nombres y columnas en español.
 - `src/seed.mjs`: inventario de ejemplo inmutable entre instalaciones, separado del espacio real.
 - `src/pages.jsx`, `src/Forms.jsx`: interfaz y flujos de trabajo.
 - `android/app/src/main/java/co/repelon/finca`: WebView con recursos privados, SQLite y servicio nativo GPS.

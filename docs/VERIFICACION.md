@@ -1,34 +1,31 @@
-# Verificación de la entrega · 3 de octubre de 2026
+# Verificación de la versión 0.3.0 · 7 de octubre de 2026
 
-Versión Android `0.2.1-piloto`, applicationId `co.repelon.finca`, versionCode 3, Android 8+ (API 26), target API 35.
+Android `0.3.0-piloto`, applicationId `co.repelon.finca`, versionCode 4, Android 8+ (API 26), target API 35. Recursos web compilados para Chrome 80; la compatibilidad se simuló en Chromium actual, no en un motor Chrome 80 real.
 
 ## Comprobaciones realizadas
 
-- `npm test`: 17 pruebas aprobadas; ninguna omitida. Cubren atribución conservadora por palma, ambigüedad, huecos/reinicios, precisión, puntos antiguos/simulados, requisitos del piloto, pesajes compatibles, balance de recursos, idempotencia, ramas y resolución de conflictos, esquema de importación, CSV y cifrado autenticado.
-- `npm run build`: compilación de producción satisfactoria. Recursos y tipografías locales; caché offline generada.
-- `npm run test:browser`: doce grupos de comprobación aprobados en Chromium. Inicio simplificado; registros por pasos; validación y foco del error; revisión antes de guardar; retroceso sin pérdida de datos; protección al cerrar, incluido el botón Atrás nativo; confirmación de guardado; apertura de Informes y pestañas con contadores, e historial en español; revisión manual con evidencia; escrituras simultáneas desde dos pestañas; métodos de pesaje; unidades de cosecha separadas; copia/importación protegida; inicio y fin explícito de jornada en navegador; recarga y escritura sin conexión; separación de datos reales y de ejemplo; navegación móvil; aumento de letra persistente y adaptación a 320, 390 y 720 px sin desbordamiento ni errores JavaScript.
-- Axe, reglas WCAG A/AA: sin incidencias en Inicio de escritorio, revisión de tarea, Inicio móvil, revisión de pesaje móvil y lista de ganado móvil. Es una comprobación automática de esos estados, no una certificación de accesibilidad de toda la aplicación.
-- Inspección visual en 1440 px y 390 px. Las tablas amplias tienen desplazamiento propio.
-- Revisión independiente de la entrega inicial: correcciones confirmadas para concurrencia, conflictos entre ramas y validación de paquetes. Las reglas se conservan y las 17 pruebas se ejecutaron de nuevo en 0.2.1.
-- Android `:app:assembleRelease`: satisfactorio, incluyendo `lintVitalAnalyzeRelease` y `lintVitalRelease`, sin desactivar comprobaciones.
-- APK alineada y firmada con una clave exclusiva del piloto. `apksigner verify --verbose`: válida con esquemas v2 y v3, un firmante.
-- Se comprobó que el certificado coincide con el de la versión anterior. Se mantiene el identificador, se aumenta versionCode y no se cambia el esquema SQLite. No se probó la instalación de la actualización en un dispositivo físico.
-- Comparación binaria: el HTML y cada recurso de la APK coinciden con la compilación web final.
-- Inspección del manifiesto compilado: no solicita permiso de Internet. GPS y datos privados funcionan con recursos locales.
-- Publicación de producción en Vercel: estado READY. Las pruebas públicas confirmaron español con navegador en inglés, apertura de Informes, historial traducido, recarga y guardado sin conexión. La guía pasó WCAG AA y adaptación a 320/390/1280 px; sus cuatro descargas y el video H.264/AAC funcionan sin sesión Vercel.
+- `npm test`: 53 pruebas aprobadas, ninguna omitida. Cubren GPS conservador, pesos, unidades, CSV, cifrado, copias v1 anteriores, fechas y tipos inválidos, orden causal, ramas, resoluciones y duplicados con distinto orden de claves JSON. También comprueban guardas para cambios desactualizados, restauración de fincas, saldos decimales y una única jornada en curso por espacio.
+- `npm run build`: compilación satisfactoria. El comando genera la caché offline de 18 recursos; no descarga videos ni APK al precargar la app.
+- `npm run test:browser`: 12 grupos aprobados. Inicio, formularios, validación, revisión manual, dos pestañas, ganado, cosechas, copias, jornadas, guardado y recarga offline, espacios separados y navegación móvil. Adaptación a 320, 390 y 720 px.
+- `npm run test:hardening`: 7 recorridos aprobados. Error de almacenamiento y reintento al reportar una tarea; quitar una foto; abrir otra pestaña durante la jornada; crear el primer animal y continuar con el pesaje; configuración desactualizada; resolución de conflictos producidos por 0.2.1; corrección de pesajes conservando su identidad.
+- `npm run test:compatibility`: 3 grupos aprobados con `toSorted`, `toReversed`, `at` y `crypto.randomUUID` ausentes antes del arranque. Inicio, UUID criptográfico, guardado persistente, tareas, ganado, jornadas, informes y fechas en español.
+- Axe, reglas WCAG A/AA: sin incidencias en las superficies verificadas de Inicio, revisión de tarea, Inicio móvil, revisión de pesaje y ganado móvil. Es una comprobación automática, no una certificación completa de accesibilidad.
+- `node scripts/verify-promo.mjs`: guía en español, WCAG AA, 320/390/1280 px, cuatro descargas válidas y reproducción H.264/AAC del video HyperFrames de 71 segundos.
+- Revisión independiente del código: encontró una guarda incompatible con metadatos antiguos en la resolución de conflictos. Se corrigió con un snapshot explícito de la versión vigente; la regresión falló antes y pasó después. Sin otros problemas críticos o importantes reportados en el alcance revisado.
+- Android `:app:assembleRelease`: satisfactorio, incluyendo lint vital. APK alineada y firma v2/v3 válida, un firmante; certificado idéntico al piloto anterior. El identificador y el esquema SQLite se conservan, versionCode aumenta a 4.
+- Comparación binaria: el HTML y los 12 recursos de la APK coinciden con la compilación web final. El manifiesto no solicita permiso de Internet.
+- Manual de uso en español actualizado a 0.3.0, cinco páginas de letras grandes. La guía promocional y el video siguen cubriendo el recorrido de anotación vigente.
 
 SHA-256 de `Finca-Repelon-piloto.apk`:
 
 ```text
-69a2d12c485a38702b743540219b119ac664a2e0026301fbf8ee948d1fdb7860
+b16dc4dfbf644fc5e269948acc81ac8702bafdbdc53c20c051fc29c83ea51129
 ```
 
 ## Validación pendiente en campo
 
-No se ejecutó la APK en un teléfono físico ni en un emulador. La compilación y la firma no demuestran autonomía, precisión ni continuidad real de la captura.
+No se ejecutó la APK en un teléfono físico ni en un emulador. La compilación y la firma no demuestran autonomía, precisión ni continuidad real de la captura. Tampoco se realizó un estudio de usabilidad con personas mayores; hay que observar la comprensión y comodidad de los trabajadores reales durante el piloto.
 
-No se realizó un estudio de usabilidad con personas mayores. La revisión visual y las pruebas de interacción cubren los cambios de esta entrega; la comprensión y comodidad con los trabajadores reales deben observarse durante el piloto.
+Antes de habilitar permanencia por palma en la finca real, pruebe los modelos autorizados durante 8 horas con pantalla bloqueada, vegetación y ubicación precisa. Registre batería, huecos, precisión, pérdidas de señal, permisos, cierre forzado y reinicio; valide el inventario y apruebe el piloto en ajustes. Los huecos no se rellenan y el GPS no verifica tareas.
 
-Antes de habilitar permanencia por palma en la finca real, pruebe los modelos autorizados durante 8 horas, con pantalla bloqueada, vegetación y ubicación precisa. Registre batería inicial/final, huecos, precisión, pérdidas de señal, permisos, cierre forzado y reinicio; valide el inventario y apruebe el piloto en ajustes. La aplicación conserva interrupciones y exige reanudar explícitamente; no rellena huecos ni verifica tareas mediante GPS.
-
-El navegador es complementario: su captura requiere la página visible. La sincronización entre equipos se realiza mediante archivos protegidos, sin servidor ni identidad criptográfica del emisor. Los responsables locales no constituyen roles autenticados. Esta entrega es un MVP para piloto, no aceptación integral de las historias H0–H5.
+El navegador captura ubicación con la página visible. La transferencia entre equipos usa archivos protegidos, sin servidor ni identidad criptográfica del emisor. Los responsables locales no son roles autenticados. La entrega sigue siendo un MVP gratuito para piloto, no aceptación integral de H0–H5.

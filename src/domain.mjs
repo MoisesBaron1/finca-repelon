@@ -59,15 +59,27 @@ export function dailyGain(weights) {
  return (b.kg-a.kg)/days;
 }
 
+function sameJson(a,b){
+ if(a===b)return true;
+ if(a===null||b===null||typeof a!=='object'||typeof b!=='object'||Array.isArray(a)!==Array.isArray(b))return false;
+ const keys=Object.keys(a),other=Object.keys(b);
+ return keys.length===other.length&&keys.every(key=>Object.prototype.hasOwnProperty.call(b,key)&&sameJson(a[key],b[key]));
+}
+
 export function mergeEvents(existing,incoming) {
  const byId=new Map(existing.map(e=>[e.id,e]));
  for(const event of incoming) {
   validateEvent(event);
   const previous=byId.get(event.id);
-  if(previous && JSON.stringify(previous)!==JSON.stringify(event)) throw new Error('Un ID tiene contenido diferente. La importación fue rechazada.');
+  if(previous && !sameJson(previous,event)) throw new Error('Un ID tiene contenido diferente. La importación fue rechazada.');
   if(!previous) byId.set(event.id,event);
  }
- const events=[...byId.values()],groups=new Map(),resolved=new Set(events.flatMap(e=>e.payload.resolvedEventIds||[])),parents=new Set(events.map(e=>e.parentEventId).filter(Boolean));
+ const events=[...byId.values()];
+ for(const event of events)for(const id of [event.parentEventId,...(event.payload.resolvedEventIds||[])]){
+  const previous=byId.get(id);
+  if(previous&&(previous.kind!==event.kind||previous.entityId!==event.entityId||previous.version>=event.version))throw new Error('El paquete contiene un historial de cambios inválido.');
+ }
+ const groups=new Map(),resolved=new Set(events.flatMap(e=>e.payload.resolvedEventIds||[])),parents=new Set(events.map(e=>e.parentEventId).filter(Boolean));
  for(const event of events) {
   if(parents.has(event.id)||resolved.has(event.id))continue;
   const key=`${event.kind}:${event.entityId}`;
@@ -79,45 +91,79 @@ export function mergeEvents(existing,incoming) {
 }
 
 export function materialize(events) {
- const state=Object.create(null);
- for(const e of events) {
-  if(!state[e.kind])state[e.kind]=new Map();
-  const old=state[e.kind].get(e.entityId);
-  if(!old||(e.version>old.version&&(!e.parentEventId||e.parentEventId===old.eventId||e.payload.resolvedEventIds?.includes(old.eventId))))state[e.kind].set(e.entityId,{...e.payload,id:e.entityId,version:e.version,eventId:e.id,updatedAt:e.time,actor:e.actor});
+ const state=Object.create(null),byId=new Map(events.map(e=>[e.id,e])),visited=new Set();
+ for(const event of events) {
+  const chain=[];let next=event;
+  // Sigue cada padre antes del hijo sin cambiar la precedencia de la rama local.
+  while(next&&!visited.has(next.id)){
+   visited.add(next.id);chain.push(next);
+   const parent=byId.get(next.parentEventId);
+   next=parent?.kind===next.kind&&parent.entityId===next.entityId?parent:null;
+  }
+  for(const e of chain.reverse()){
+   if(!state[e.kind])state[e.kind]=new Map();
+   const old=state[e.kind].get(e.entityId);
+   if(!old||(e.version>old.version&&(!e.parentEventId||e.parentEventId===old.eventId||e.payload.resolvedEventIds?.includes(old.eventId))))state[e.kind].set(e.entityId,{...e.payload,id:e.entityId,version:e.version,eventId:e.id,updatedAt:e.time,actor:e.actor});
+  }
  }
  return Object.fromEntries(Object.entries(state).map(([key,value])=>[key,[...value.values()].filter(x=>!x.archived)]));
 }
 
+const isRecord=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
+function validDate(value){
+ if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;
+ const time=Date.parse(value+'T00:00:00Z');
+ return Number.isFinite(time)&&new Date(time).toISOString().slice(0,10)===value;
+}
+const validTime=value=>typeof value==='string'&&validDate(value.slice(0,10))&&/^\d{4}-\d{2}-\d{2}T/.test(value)&&Number.isFinite(Date.parse(value));
+const validPhoto=value=>value==null||value===''||typeof value==='string'&&/^data:image\/(jpeg|png|webp);base64,/.test(value);
+const validPoint=p=>isRecord(p)&&validCoordinate(p.lat,p.lng)&&Number.isFinite(p.accuracy)&&p.accuracy>=0&&Number.isFinite(p.monoMs)&&p.monoMs>=0&&typeof p.segment==='string'&&p.segment.length>0&&(p.ageMs===undefined||Number.isFinite(p.ageMs)&&p.ageMs>=0)&&(p.mock===undefined||typeof p.mock==='boolean')&&(p.time===undefined||validTime(p.time));
+const statuses={tasks:['Pendiente','En curso','Por revisar','Verificada'],animals:['Activo','Vendido','Retirado','Fallecido'],incidents:['Abierta','Resuelta'],sessions:['En curso','Terminada','Interrumpida']};
 export const RECORD_KINDS=new Set(['settings','tasks','palms','animals','weights','health','plots','harvests','labors','resources','movements','finances','incidents','sessions','points','people']);
 export function validateEvent(event) {
- if(!event||typeof event.id!=='string'||typeof event.entityId!=='string'||!RECORD_KINDS.has(event.kind)||!Number.isSafeInteger(event.version)||event.version<1||!event.payload||Array.isArray(event.payload)||typeof event.payload!=='object')throw new Error('El paquete contiene registros inválidos.');
+ if(!isRecord(event)||typeof event.id!=='string'||!event.id||typeof event.entityId!=='string'||!event.entityId||!RECORD_KINDS.has(event.kind)||!Number.isSafeInteger(event.version)||event.version<1||!isRecord(event.payload))throw new Error('El paquete contiene registros inválidos.');
  const p=event.payload,string=k=>typeof p[k]==='string'&&p[k].length>0,num=k=>Number.isFinite(p[k]),bad=()=>{throw new Error(`Registro inválido: ${event.kind}. Revisa su formato.`);};
- for(const field of ['name','code','zone','lot','status','date','note','title','target','module','sex','breed','birth','variety','stage','unit','currency','type','personId','animalId','plotId','resourceId','concept','destination','method','start','end','workerName','location'])if(p[field]!==undefined&&typeof p[field]!=='string')bad();
- if(p.resolvedEventIds&&(!Array.isArray(p.resolvedEventIds)||p.resolvedEventIds.some(x=>typeof x!=='string')))bad();
- if(p.review&&(!stringReview(p.review)))bad();
- if(p.photo&&!/^data:image\/(jpeg|png|webp);base64,/.test(p.photo))bad();
+ for(const field of ['actor','deviceId','farmId','time'])if(event[field]!==undefined&&typeof event[field]!=='string')bad();
+ if(event.parentEventId!=null&&(typeof event.parentEventId!=='string'||!event.parentEventId))bad();
+ if(event.time!==undefined&&!validTime(event.time)&&!validDate(event.time))bad();
+ for(const field of ['name','code','zone','lot','status','date','note','title','target','module','sex','breed','birth','variety','stage','unit','currency','type','personId','animalId','plotId','resourceId','concept','destination','method','start','end','workerName','location','role','priority','nextDate','professional','planted','surveyDate','surveyMethod','equipment','reason','resolution','resolutionReason','taskId','sessionId','segment','provider','farmId','time','updatedAt','resolvedAt'])if(p[field]!==undefined&&typeof p[field]!=='string')bad();
+ if(p.reviewedTaskId!=null&&typeof p.reviewedTaskId!=='string')bad();
+ for(const field of ['archived','validated','pilotApproved','resolved','mock','native','example'])if(p[field]!==undefined&&typeof p[field]!=='boolean')bad();
+ for(const field of ['area','row','plants','cycle','planVersion','ageMs','monoMs','accuracy'])if(p[field]!==undefined&&!(field==='plants'&&p[field]===null)&&!num(field))bad();
+ for(const field of ['date','birth','nextDate','planted','surveyDate'])if(p[field]!==undefined&&p[field]!==''&&!validDate(p[field]))bad();
+ for(const field of ['start','end','time','updatedAt','resolvedAt'])if(p[field]!==undefined&&p[field]!==''&&!validTime(p[field])&&!validDate(p[field]))bad();
+ for(const field of ['resolvedEventIds','palmIds'])if(p[field]!=null&&(!Array.isArray(p[field])||p[field].some(x=>typeof x!=='string'||!x)))bad();
+ for(const field of ['row','cycle','planVersion'])if(p[field]!==undefined&&(!Number.isSafeInteger(p[field])||p[field]<1))bad();
+ if(p.plants!=null&&(!Number.isSafeInteger(p.plants)||p.plants<1))bad();
+ if(p.area!==undefined&&p.area<0||p.ageMs!==undefined&&p.ageMs<0)bad();
+ if(p.status!==undefined&&statuses[event.kind]&&!statuses[event.kind].includes(p.status))bad();
+ if(p.module!==undefined&&!['Palma','Ganado','Plátano','General'].includes(p.module))bad();
+ if(p.priority!==undefined&&!['Alta','Media','Baja'].includes(p.priority))bad();
+ if(event.kind==='plots'&&p.stage!==undefined&&!['Establecimiento','Desarrollo','Floración','Producción','Finalizado'].includes(p.stage))bad();
+ if(p.review!=null&&!stringReview(p.review))bad();
+ if(!validPhoto(p.photo))bad();
  if(event.kind==='settings'&&(!string('farmId')||!string('name')))bad();
  if(event.kind==='tasks'&&(!string('name')||!['Palma','Ganado','Plátano','General'].includes(p.module)||p.palmIds&&(!Array.isArray(p.palmIds)||p.palmIds.some(x=>typeof x!=='string'))))bad();
  if(event.kind==='palms'&&(!string('code')||!validCoordinate(p.lat,p.lng)||!num('accuracy')||p.accuracy<0))bad();
  if(event.kind==='animals'&&(!string('code')||!string('name')))bad();
  if(event.kind==='people'&&!string('name'))bad();
- if(event.kind==='health'&&(!string('animalId')||!string('note')||!string('type')))bad();
+ if(event.kind==='health'&&(!string('animalId')||!string('note')||!string('type')||!string('date')&&!string('nextDate')))bad();
  if(event.kind==='incidents'&&(!string('title')||!string('note')||!string('target')))bad();
- if(event.kind==='labors'&&(!string('plotId')||!string('type')||!string('note')))bad();
+ if(event.kind==='labors'&&(!string('plotId')||!string('type')||!string('note')||!string('date')))bad();
  if(event.kind==='weights'&&(!string('animalId')||!num('kg')||p.kg<=0||!['Báscula','Cinta','Estimación visual'].includes(p.method)||!string('date')))bad();
  if(event.kind==='plots'&&(!string('name')||!num('area')||p.area<=0||!Number.isInteger(p.cycle)||p.cycle<1))bad();
  if(event.kind==='harvests'&&(!string('plotId')||!num('quantity')||p.quantity<=0||!['kg','racimos'].includes(p.unit)||!string('date')))bad();
  if(event.kind==='resources'&&(!string('name')||!string('unit')||!num('minimum')||p.minimum<0))bad();
  if(event.kind==='movements'&&(!string('resourceId')||!num('delta')||p.delta===0))bad();
  if(event.kind==='finances'&&(!num('amount')||p.amount<=0||!['COP','USD','EUR'].includes(p.currency)||!['Gasto','Ingreso'].includes(p.type)))bad();
- if(event.kind==='points'&&(!validCoordinate(p.lat,p.lng)||!num('accuracy')||!num('monoMs')||!string('sessionId')||!string('segment')))bad();
- if(event.kind==='sessions'&&(!string('start')||!string('status')||!Array.isArray(p.points)||p.points.some(x=>!validCoordinate(x.lat,x.lng)||!Number.isFinite(x.accuracy)||!Number.isFinite(x.monoMs)||typeof x.segment!=='string')))bad();
+ if(event.kind==='points'&&(!validPoint(p)||!string('sessionId')))bad();
+ if(event.kind==='sessions'&&(!string('start')||!string('status')||!Array.isArray(p.points)||p.points.some(x=>!validPoint(x))))bad();
  if(event.kind==='sessions'){
   if(p.palmsSnapshot!==undefined){if(!Array.isArray(p.palmsSnapshot))bad();for(const palm of p.palmsSnapshot)validateEvent({id:'snapshot',entityId:'snapshot',kind:'palms',version:1,payload:palm});}
-  if(p.diagnostics!==undefined&&(!Array.isArray(p.diagnostics)||p.diagnostics.some(d=>typeof d.reason!=='string'||typeof d.time!=='string')))bad();
+  if(p.diagnostics!==undefined&&(!Array.isArray(p.diagnostics)||p.diagnostics.some(d=>!isRecord(d)||typeof d.reason!=='string'||!validTime(d.time))))bad();
  }
 }
-const stringReview=p=>typeof p==='object'&&typeof p.by==='string'&&typeof p.date==='string'&&typeof p.reason==='string'&&(!p.photo||/^data:image\/(jpeg|png|webp);base64,/.test(p.photo));
+const stringReview=p=>isRecord(p)&&typeof p.by==='string'&&(validDate(p.date)||validTime(p.date))&&typeof p.reason==='string'&&validPhoto(p.photo);
 
 export function parseCsv(text) {
  text=text.replace(/^\uFEFF/,'');
@@ -139,7 +185,7 @@ export const stockBalance = (movements,resourceId) => movements.filter(x=>x.reso
 export const sumByUnit = records => records.reduce((s,x)=>({...s,[x.unit]:(s[x.unit]||0)+Number(x.quantity)}),{});
 export function toCsv(rows) {
  if(!rows.length)return '\uFEFF';
- const columns=[...new Set(rows.flatMap(x=>Object.keys(x)))],escape=x=>'"'+String(x??'').replaceAll('"','""')+'"';
+ const columns=[...new Set(rows.flatMap(x=>Object.keys(x)))],escape=x=>'"'+String(x??'').replace(/"/g,'""')+'"';
  const safe=x=>typeof x==='string'&&/^[=+@\-]/.test(x)?`'${x}`:x;
  return '\uFEFF'+[columns.map(escape).join(';'),...rows.map(row=>columns.map(c=>escape(safe(row[c]))).join(';'))].join('\r\n');
 }

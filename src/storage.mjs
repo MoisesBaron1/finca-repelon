@@ -61,13 +61,22 @@ export function transact(mode,mutator) {
 const b64=bytes=>{let s='';for(const b of bytes)s+=String.fromCharCode(b);return btoa(s);};
 const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 async function keyFor(password,salt,usage) {
- if(password.length<8)throw new Error('Usa una contraseña de al menos 8 caracteres.');
+ if(typeof password!=='string'||password.length<8)throw new Error('Usa una contraseña de al menos 8 caracteres.');
  const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveKey']);
  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:250000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,[usage]);
 }
+function packageFarm(events){
+ if(!Array.isArray(events))throw new Error('La copia contiene registros inválidos.');
+ checkSize(events);mergeEvents([],events);
+ const settings=materialize(events).settings;
+ if(!settings||settings.length!==1)throw new Error('La copia debe contener una única finca válida.');
+ const farm=settings[0];
+ if(events.some(e=>e.farmId!==farm.farmId))throw new Error('La copia contiene registros de otra finca.');
+ return farm;
+}
 export async function encryptPackage(events,password,mode) {
- checkSize(events);
- const farm=materialize(events).settings[0],payload={format:'repelon',schema:1,mode,farmId:farm.farmId,farmName:farm.name,createdAt:new Date().toISOString(),events};
+ if(!['demo','real'].includes(mode))throw new Error('El modo de la copia no es válido.');
+ const farm=packageFarm(events),payload={format:'repelon',schema:1,mode,farmId:farm.farmId,farmName:farm.name,createdAt:new Date().toISOString(),events};
  const plain=new TextEncoder().encode(JSON.stringify(payload)),checksum=b64(new Uint8Array(await crypto.subtle.digest('SHA-256',plain)));
  const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
  const key=await keyFor(password,salt,'encrypt');
@@ -76,19 +85,19 @@ export async function encryptPackage(events,password,mode) {
 }
 export async function decryptPackage(text,password) {
  let envelope;try{envelope=JSON.parse(text);}catch{throw new Error('El archivo no es una copia de Finca Repelón.');}
- if(envelope.format!=='repelon-encrypted'||envelope.schema!==1)throw new Error('Formato de copia no compatible.');
+ if(!envelope||typeof envelope!=='object'||Array.isArray(envelope)||envelope.format!=='repelon-encrypted'||envelope.schema!==1)throw new Error('Formato de copia no compatible.');
  try {
-  const key=await keyFor(password,unb64(envelope.salt),'decrypt');
-  const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(envelope.iv),additionalData:new TextEncoder().encode('repelon-v1')},key,unb64(envelope.body));
+  if(['salt','iv','checksum','body'].some(field=>typeof envelope[field]!=='string'))throw new Error('envelope');
+  const salt=unb64(envelope.salt),iv=unb64(envelope.iv),body=unb64(envelope.body);
+  if(salt.length!==16||iv.length!==12||unb64(envelope.checksum).length!==32||body.length<16)throw new Error('envelope');
+  const key=await keyFor(password,salt,'decrypt');
+  const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv,additionalData:new TextEncoder().encode('repelon-v1')},key,body);
   const checksum=b64(new Uint8Array(await crypto.subtle.digest('SHA-256',plain)));
   if(checksum!==envelope.checksum)throw new Error('checksum');
   const payload=JSON.parse(new TextDecoder().decode(plain));
-  if(payload.format!=='repelon'||payload.schema!==1||!Array.isArray(payload.events)||!payload.farmId||!['demo','real'].includes(payload.mode))throw new Error('schema');
-  if(payload.events.some(e=>e.farmId!==payload.farmId))throw new Error('farm');
-  mergeEvents([],payload.events);
-  checkSize(payload.events);
-  const settings=materialize(payload.events).settings;
-  if(!settings||settings.length!==1||settings[0].farmId!==payload.farmId)throw new Error('farm-config');
+  if(!payload||typeof payload!=='object'||Array.isArray(payload)||payload.format!=='repelon'||payload.schema!==1||typeof payload.farmId!=='string'||!payload.farmId||!['demo','real'].includes(payload.mode))throw new Error('schema');
+  const farm=packageFarm(payload.events);
+  if(farm.farmId!==payload.farmId)throw new Error('farm-config');
   return payload;
  }catch(error){if(error.message.includes('8 caracteres'))throw error;throw new Error('Contraseña incorrecta o archivo alterado. No se importó ningún dato.');}
 }

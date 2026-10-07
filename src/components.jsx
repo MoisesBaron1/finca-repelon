@@ -1,8 +1,14 @@
 import React,{useEffect,useRef,useState,useId} from 'react';
 import {X,Leaf,Plus,ChevronRight,Check,MapPin,Navigation,LocateFixed,ZoomIn,ZoomOut,ImagePlus,AlertCircle} from 'lucide-react';
+import {preparePhoto} from './photo.mjs';
 
 export function IconButton({label,children,...props}){return <button className="icon-button" aria-label={label} title={label} {...props}>{children}</button>}
 export function Button({children,icon:Icon,variant='primary',className='',...props}){return <button className={`button ${variant} ${className}`} {...props}>{Icon&&<Icon size={17}/>}<span>{children}</span></button>}
+export function AsyncButton({onClick,children,disabled,busyLabel='Guardando…',onError,...props}){
+ const [busy,setBusy]=useState(false),[error,setError]=useState(''),pending=useRef(false);
+ async function run(e){if(pending.current)return;pending.current=true;setBusy(true);setError('');try{await onClick(e)}catch(e){const message=e.message||'No se pudo completar. Tus datos siguen guardados. Intenta otra vez.';setError(message);onError?.(e)}finally{pending.current=false;setBusy(false)}}
+ return <>{error&&<span className="action-error" role="alert">{error}</span>}<Button {...props} disabled={disabled||busy} aria-busy={busy} onClick={run}>{busy?busyLabel:children}</Button></>;
+}
 export function Badge({children,tone}){
  const tones={'Verificada':'green','Activo':'green','Producción':'green','Terminada':'green','Por revisar':'amber','Alta':'red','Abierta':'amber','Pendiente':'gray','En curso':'blue','Interrumpida':'red','Floración':'amber','Baja':'gray','Media':'amber','Resuelta':'green','Reportada':'blue','Probable':'blue','Ambigua':'amber'};
  return <span className={`badge ${tone||tones[children]||'gray'}`}>{children}</span>
@@ -16,47 +22,50 @@ export function Dialog({title,subtitle,children,onClose,wide=false,closeDisabled
  <div className="dialog-head"><div><h2 id="dialog-title">{title}</h2>{subtitle&&<p>{subtitle}</p>}</div><Button variant="secondary" disabled={closeDisabled} onClick={onClose}>Cerrar</Button></div>
  {children}</dialog>
 }
-export function Field({label,name,type='text',options,required=false,defaultValue,value,onChange,help,min,max,step,wide=false}){
+export function Field({label,name,type='text',options,required=false,defaultValue,value,onChange,help,min,max,step,wide=false,disabled=false,minLength,maxLength}){
  const helpId=useId();
  const control=value!==undefined?{value,onChange}:{defaultValue};
  return <label className={`field ${wide?'full':''}`}><span>{label}{required&&<span className="required" aria-hidden="true"> *</span>}</span>
- {type==='select'?<select aria-label={label} aria-describedby={help?helpId:undefined} name={name} {...control} required={required}><option value="" disabled={required}>{required?'Elige una opción':'Sin seleccionar'}</option>{options?.map(o=><option key={o.value??o} value={o.value??o}>{o.label??o}</option>)}</select>:type==='textarea'?<textarea aria-label={label} aria-describedby={help?helpId:undefined} name={name} rows={3} {...control} required={required}/>:<input aria-label={label} aria-describedby={help?helpId:undefined} name={name} type={type} inputMode={type==='number'?'decimal':undefined} {...control} required={required} min={min} max={max} step={step} autoComplete={type==='password'?'new-password':'off'}/>}
+ {type==='select'?<select aria-label={label} aria-describedby={help?helpId:undefined} name={name} {...control} required={required} disabled={disabled}><option value="" disabled={required}>{required?'Elige una opción':'Sin seleccionar'}</option>{options?.map(o=><option key={o.value??o} value={o.value??o}>{o.label??o}</option>)}</select>:type==='textarea'?<textarea aria-label={label} aria-describedby={help?helpId:undefined} name={name} rows={3} {...control} required={required} disabled={disabled} maxLength={maxLength||4000}/>:<input aria-label={label} aria-describedby={help?helpId:undefined} name={name} type={type} inputMode={type==='number'?(String(step)==='1'?'numeric':'decimal'):undefined} {...control} required={required} disabled={disabled} min={min} max={max} step={step} minLength={minLength} maxLength={maxLength||(type==='text'?300:undefined)} autoComplete={type==='password'?'new-password':'off'}/>}
  {help&&<small id={helpId}>{help}</small>}</label>
 }
 export function RecordForm({fields,onSubmit,onCancel,values={},children,submitLabel='Guardar registro',photo=false,steps,onDirtyChange,onBusyChange}){
- const [busy,setBusy]=useState(false),[error,setError]=useState(''),[image,setImage]=useState(values.photo||''),[step,setStep]=useState(0);
- const [draft,setDraft]=useState(()=>Object.fromEntries(fields.map(f=>[f.name,values[f.name]??f.defaultValue??''])));
+ const [busy,setBusy]=useState(false),[attaching,setAttaching]=useState(false),[error,setError]=useState(''),[image,setImage]=useState(values.photo||''),[step,setStep]=useState(0),pending=useRef(false);
+ const [draft,setDraft]=useState(()=>Object.fromEntries(fields.map(f=>{const value=values[f.name]??f.defaultValue??'';return[f.name,f.type==='select'&&value!==''&&!f.options?.some(o=>(o.value??o)===value)?f.defaultValue??'':value]})));
  const formRef=useRef(),headingRef=useRef(),isReview=!!steps&&step===steps.length;
  const shown=steps?(steps[step]?.fields||[]).map(name=>fields.find(f=>f.name===name)).filter(Boolean):fields.filter(f=>f.required);
  const optional=fields.filter(f=>!f.required&&!steps?.some(s=>s.fields.includes(f.name)));
  useEffect(()=>{if(step>0)headingRef.current?.focus();},[step]);
+ useEffect(()=>{onBusyChange?.(busy||attaching)},[busy,attaching]);
  function change(name,value){setDraft(d=>({...d,[name]:value}));onDirtyChange?.(true);setError('');}
  function validate(){
-  const invalid=formRef.current.querySelector('input:invalid,select:invalid,textarea:invalid');
+  const controls=[...formRef.current.querySelectorAll('input,select,textarea')];
+  for(const control of controls)if(control.required&&['text','textarea'].includes(control.type))control.setCustomValidity(control.value.trim()?'':'Escribe este dato.');
+  const invalid=controls.find(control=>!control.validity.valid);
   if(!invalid)return true;
   const field=fields.find(f=>f.name===invalid.name);
-  setError(`Revisa «${field?.label||'este dato'}». ${invalid.validity.valueMissing?'Falta completarlo.':'Usa un valor dentro del rango indicado.'}`);
+  setError(`Revisa «${field?.label||'este dato'}». ${invalid.validity.valueMissing||invalid.validity.customError?'Falta completarlo.':'Usa un valor dentro del rango indicado.'}`);
   const details=invalid.closest('details');if(details)details.open=true;
   invalid.focus();invalid.reportValidity();return false;
  }
  async function submit(e){
-  e.preventDefault();if(!validate())return;
+  e.preventDefault();if(pending.current||attaching||!validate())return;
   if(steps&&!isReview){setError('');setStep(s=>s+1);return;}
-  setBusy(true);onBusyChange?.(true);setError('');
-  try{const data={...draft};for(const f of fields)if(f.type==='number')data[f.name]=data[f.name]===''?null:Number(data[f.name]);if(image)data.photo=image;await onSubmit(data);}
+  pending.current=true;setBusy(true);setError('');
+  try{const data={...draft};for(const f of fields){if(typeof data[f.name]==='string')data[f.name]=data[f.name].trim();if(f.type==='number')data[f.name]=data[f.name]===''?null:Number(data[f.name]);}if(photo)data.photo=image||null;await onSubmit(data);}
   catch(e){setError(e.message||'No se pudo guardar. Tus datos siguen aquí. Intenta otra vez.');}
-  finally{setBusy(false);onBusyChange?.(false);}
+  finally{pending.current=false;setBusy(false);}
  }
- async function attach(e){const f=e.target.files[0];if(!f)return;if(f.size>3*1024*1024){setError('Esta foto es muy grande. Elige una de menos de 3 MB.');return;}if(!['image/jpeg','image/png','image/webp'].includes(f.type)){setError('Elige una foto JPG, PNG o WebP.');return;}const reader=new FileReader();reader.onload=()=>{setImage(reader.result);onDirtyChange?.(true);};reader.readAsDataURL(f);}
+ async function attach(e){const input=e.target,f=input.files[0];if(!f)return;setAttaching(true);setError('');onDirtyChange?.(true);try{setImage(await preparePhoto(f))}catch(e){setError(e.message)}finally{setAttaching(false);input.value='';}}
  function showValue(f){const value=draft[f.name];if(value===''||value==null)return 'Sin anotar';if(f.type==='select')return f.options?.find(o=>(o.value??o)===value)?.label||value;if(f.type==='date')return new Date(value+'T12:00:00').toLocaleDateString('es-CO',{day:'numeric',month:'long',year:'numeric'});return value;}
- const renderField=f=><Field key={f.name} {...f} value={draft[f.name]} onChange={e=>change(f.name,e.target.value)}/>;
+ const renderField=f=><Field key={f.name} {...f} disabled={busy||attaching} value={draft[f.name]} onChange={e=>{e.target.setCustomValidity('');change(f.name,e.target.value)}}/>;
  return <form ref={formRef} onSubmit={submit} className="record-form" noValidate>
  {steps&&<div className="form-step"><p>Paso {step+1} de {steps.length+1}</p><h3 ref={headingRef} tabIndex={-1}>{isReview?'Revisa tu anotación':steps[step].title}</h3><p>{isReview?'Si todo está bien, toca el botón de abajo para guardar.':steps[step].hint||'Completa estos datos y toca Continuar.'}</p></div>}
  {isReview?<><dl className="record-review">{fields.filter(f=>f.required||draft[f.name]!=='').map(f=><div key={f.name}><dt>{f.label}</dt><dd>{showValue(f)}</dd></div>)}</dl>{image&&<p className="review-photo"><Check size={20}/> Foto incluida</p>}</>:<><p className="required-note">Los datos con * son necesarios.</p><div className="form-grid">{shown.map(renderField)}{children}</div>
  {(!steps||step===steps.length-1)&&optional.length>0&&<details className="optional-fields"><summary>Añadir otros detalles (opcional)</summary><div className="form-grid">{optional.map(renderField)}</div></details>}
- {photo&&(!steps||step===steps.length-1)&&<div className="field full photo-field"><span>Foto (opcional)</span><label className="photo-picker"><ImagePlus size={23}/> {image?'Cambiar foto':'Añadir foto'}<input type="file" accept="image/jpeg,image/png,image/webp" onChange={attach}/></label>{image&&<div className="photo-preview"><img src={image} alt="Evidencia adjunta"/><button type="button" onClick={()=>{setImage('');onDirtyChange?.(true)}}>Quitar foto</button></div>}</div>}</>}
+ {photo&&(!steps||step===steps.length-1)&&<div className="field full photo-field"><span>Foto (opcional)</span><label className="photo-picker"><ImagePlus size={23}/> {attaching?'Preparando foto…':image?'Cambiar foto':'Añadir foto'}<input type="file" accept="image/jpeg,image/png,image/webp" disabled={attaching||busy} onChange={attach}/></label><small>La foto se reduce para ocupar menos espacio en el teléfono.</small>{attaching&&<p role="status">Preparando la foto. Espera un momento.</p>}{image&&<div className="photo-preview"><img src={image} alt="Evidencia adjunta"/><button type="button" disabled={busy||attaching} onClick={()=>{setImage('');onDirtyChange?.(true)}}>Quitar foto</button></div>}</div>}</>}
  {error&&<p className="form-error" role="alert"><AlertCircle size={20}/>{error}</p>}
- <div className="dialog-foot"><p className="save-note">{isReview||!steps?'Se guardará en este teléfono o equipo.':'Todavía no se ha guardado.'}</p><div className="form-buttons"><Button type="button" variant="secondary" disabled={busy} onClick={()=>step>0?(setStep(s=>s-1),setError('')):onCancel()}>{step>0?'Volver al paso anterior':'Salir sin guardar'}</Button><Button type="submit" disabled={busy}>{busy?'Guardando…':steps&&!isReview?'Continuar':submitLabel}</Button></div></div></form>
+ <div className="dialog-foot"><p className="save-note">{isReview||!steps?'Se guardará en este teléfono o equipo.':'Todavía no se ha guardado.'}</p><div className="form-buttons"><Button type="button" variant="secondary" disabled={busy||attaching} onClick={()=>step>0?(setStep(s=>s-1),setError('')):onCancel()}>{step>0?'Volver al paso anterior':'Salir sin guardar'}</Button><Button type="submit" aria-busy={busy||attaching} disabled={busy||attaching}>{attaching?'Preparando foto…':busy?'Guardando…':steps&&!isReview?'Continuar':submitLabel}</Button></div></div></form>
 }
 
 export function SectionTitle({title,subtitle,action}){return <div className="section-title"><div><h2>{title}</h2>{subtitle&&<p>{subtitle}</p>}</div>{action}</div>}

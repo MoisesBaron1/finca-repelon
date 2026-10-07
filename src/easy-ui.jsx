@@ -10,8 +10,16 @@ export const guidedSteps={
  incident:[{title:'¿Qué pasó y dónde?',fields:['title','target','module']},{title:'Cuéntanos el detalle',fields:['note','priority','date']}],
  finance:[{title:'¿Qué dinero quieres anotar?',fields:['type','concept','module']},{title:'Anota el valor',fields:['amount','currency','date']}],
  session:[{title:'¿Quién hará el recorrido?',fields:['personId','zone','name','taskId'],hint:'Elige el responsable y la zona. Después podrás revisar e iniciar.'}],
+ animal:[{title:'Identifica el animal',fields:['code','name','sex','lot']},{title:'Estado del animal',fields:['status'],hint:'Puedes añadir la raza, el nacimiento y una foto si los tienes.'}],
+ health:[{title:'Elige el animal y el cuidado',fields:['animalId','type','date','priority']},{title:'Anota lo observado',fields:['note','nextDate'],hint:'El próximo control es opcional. Sigue las indicaciones del veterinario.'}],
+ plot:[{title:'Identifica el lote',fields:['name','area','variety']},{title:'Siembra y etapa actual',fields:['planted','stage','plants'],hint:'Si no conoces el número de plantas, déjalo vacío.'}],
+ labor:[{title:'Elige el trabajo y el lote',fields:['plotId','type','date','personId']},{title:'Anota lo que hiciste',fields:['note']}],
+ movement:[{title:'Elige el recurso y el movimiento',fields:['resourceId','direction']},{title:'Anota la cantidad',fields:['quantity','date','note']}],
+ resource:[{title:'Identifica el recurso',fields:['name','unit','minimum'],hint:'El saldo se anota después con una entrada de inventario.'}],
+ person:[{title:'Añade el responsable',fields:['name','role']}],
+ palm:[{title:'Identifica la palma',fields:['code','zone','row']},{title:'Coordenadas del levantamiento',fields:['lat','lng','accuracy']},{title:'Revisa el origen de las coordenadas',fields:['surveyDate','surveyMethod','validatedText']}],
 };
-export const saveLabels={task:'Guardar tarea',weight:'Guardar pesaje',harvest:'Guardar cosecha',incident:'Guardar problema',finance:'Guardar gasto o ingreso',session:'Comenzar jornada',health:'Guardar salud',labor:'Guardar trabajo'};
+export const saveLabels={task:'Guardar tarea',weight:'Guardar pesaje',harvest:'Guardar cosecha',incident:'Guardar problema',finance:'Guardar gasto o ingreso',session:'Comenzar jornada',health:'Guardar salud',labor:'Guardar trabajo',animal:'Guardar animal',plot:'Guardar lote',movement:'Guardar movimiento',resource:'Guardar recurso',person:'Guardar responsable',palm:'Guardar palma'};
 export const savedTitles={task:'Tarea guardada',weight:'Pesaje guardado',harvest:'Cosecha guardada',incident:'Problema guardado',finance:'Movimiento de dinero guardado',animal:'Animal guardado',palm:'Palma guardada',plot:'Lote guardado',health:'Salud guardada',labor:'Trabajo guardado',resource:'Recurso guardado',movement:'Entrada o salida guardada',person:'Responsable guardado',review:'Revisión guardada'};
 
 export function EntryDialog({title,subtitle,onClose,fields,values,form,onSubmit,photo,submitLabel,children}){
@@ -36,12 +44,12 @@ export function RecordChoices({onClose}){
   ['health','Anotar salud de ganado','Registra una observación o cuidado.',HeartPulse,state.animals.some(a=>a.status==='Activo')?'health':'animal','Primero añade un animal.'],
   ['labor','Anotar trabajo de cultivo','Registra limpieza, riego u otra labor.',Leaf,state.plots.some(p=>p.stage!=='Finalizado')?'labor':'plot','Primero añade un lote.'],
  ];
- return <Dialog title="¿Qué quieres anotar?" subtitle="Elige una opción. Te ayudaremos paso a paso." onClose={onClose}><div className="record-choices">{entries.map(([id,label,detail,Icon,type,first])=><button key={id} className="record-choice" onClick={()=>setDialog({type})}><Icon size={27}/><span><strong>{label}</strong><small>{type===id?detail:first}</small></span><ChevronRight size={23}/></button>)}</div></Dialog>;
+ return <Dialog title="¿Qué quieres anotar?" subtitle="Elige una opción. Te ayudaremos paso a paso." onClose={onClose}><div className="record-choices">{entries.map(([id,label,detail,Icon,type,first])=><button key={id} className="record-choice" onClick={()=>setDialog({type,followUp:type===id?undefined:id})}><Icon size={27}/><span><strong>{label}</strong><small>{type===id?detail:first}</small></span><ChevronRight size={23}/></button>)}</div></Dialog>;
 }
 
 export function SavedDialog({data,onClose}){
  const {navigate,setDialog}=useFarm();
- return <Dialog title={data.title||'Anotación guardada'} onClose={onClose}><div className="saved-result"><CheckCircle2 size={54}/><h3>Listo. Tus datos quedaron guardados.</h3><p>Puedes continuar trabajando, aunque no tengas internet.</p>{data.summary&&<p className="saved-summary">{data.summary}</p>}<div className="stack-buttons"><Button icon={House} onClick={()=>navigate('overview')}>Volver al inicio</Button><Button variant="secondary" onClick={onClose}>Seguir en esta pantalla</Button>{data.again&&<Button variant="secondary" onClick={()=>setDialog({type:data.again})}>Hacer otra anotación</Button>}</div></div></Dialog>;
+ return <Dialog title={data.title||'Anotación guardada'} onClose={onClose}><div className="saved-result"><CheckCircle2 size={54}/><h3>Listo. Tus datos quedaron guardados.</h3><p>Puedes continuar trabajando, aunque no tengas internet.</p>{data.summary&&<p className="saved-summary">{data.summary}</p>}<div className="stack-buttons"><>{data.continueWith&&<Button onClick={()=>setDialog(data.continueWith)}>{data.continueLabel}</Button>}<Button variant={data.continueWith?'secondary':'primary'} icon={House} onClick={()=>navigate('overview')}>Volver al inicio</Button></><Button variant="secondary" onClick={onClose}>Seguir en esta pantalla</Button>{data.again&&<Button variant="secondary" onClick={()=>setDialog({type:data.again})}>Hacer otra anotación</Button>}</div></div></Dialog>;
 }
 
 export function HelpDialog({onClose}){

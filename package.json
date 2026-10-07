@@ -1,13 +1,15 @@
 {
   "name": "finca-repelon",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "build": "vite build && node scripts/create-sw.mjs",
     "test": "node --test tests/*.test.mjs",
-    "test:browser": "node scripts/verify-browser.mjs"
+    "test:browser": "node scripts/verify-browser.mjs",
+    "test:hardening": "node scripts/verify-hardening.mjs",
+    "test:compatibility": "node scripts/verify-compatibility.mjs"
   },
   "dependencies": {
     "@fontsource/manrope": "5.2.8",
