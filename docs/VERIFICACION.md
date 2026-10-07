@@ -22,6 +22,14 @@ SHA-256 de `Finca-Repelon-piloto.apk`:
 b16dc4dfbf644fc5e269948acc81ac8702bafdbdc53c20c051fc29c83ea51129
 ```
 
+## Verificación de producción
+
+Publicación del commit `83bc6c0` en Vercel, despliegue `dpl_HJ6NECbtqgbxYj2DMwurABiD2Dea`, estado READY y destino production. App pública: https://temporary-spry-jasper-gs4cyvp.vercel.app.
+
+- `node artifacts/verify-vercel.mjs`: aprobado en la dirección pública sin sesión de Vercel. Cuatro acciones grandes, interfaz e historial en español incluso con navegador en inglés, pesajes persistentes y guardado y recarga sin conexión.
+- `APP_URL=https://temporary-spry-jasper-gs4cyvp.vercel.app node scripts/verify-promo.mjs`: aprobado. Guía accesible en 320/390/1280 px, cuatro descargas HTTP 200 y reproducción H.264/AAC del video HyperFrames de 71 segundos.
+- HTML y service worker HTTP 200, con el paquete final `index-CbunQPCe.js`. APK y manual PDF publicados idénticos byte por byte a los archivos locales. SHA-256 del manual: `bf2a4f8ed09179d7ba07897a8c8a186afdbad2829b5a2659f67d3aa574c1055c`.
+
 ## Validación pendiente en campo
 
 No se ejecutó la APK en un teléfono físico ni en un emulador. La compilación y la firma no demuestran autonomía, precisión ni continuidad real de la captura. Tampoco se realizó un estudio de usabilidad con personas mayores; hay que observar la comprensión y comodidad de los trabajadores reales durante el piloto.
