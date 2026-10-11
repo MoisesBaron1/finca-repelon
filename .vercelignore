@@ -11,3 +11,6 @@ tests
 *.keystore
 *.password
 .env*
+promo
+.claude
+*.finca

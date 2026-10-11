@@ -1,0 +1,78 @@
+{
+  "duration": 70.932,
+  "scenes": [
+    {
+      "id": "intro",
+      "text": "Con Finca Repelón, lleva las cuentas del campo desde tu celular. Gratis durante esta etapa piloto.",
+      "file": "assets/voz/intro.wav",
+      "start": 0,
+      "duration": 8.572,
+      "voiceStart": 0.8,
+      "voiceDuration": 6.971917
+    },
+    {
+      "id": "inicio",
+      "text": "En Inicio, toca lo que necesitas: ver tareas, anotar un dato, avisar un problema o iniciar tu jornada.",
+      "file": "assets/voz/inicio.wav",
+      "start": 8.572,
+      "duration": 9.252,
+      "voiceStart": 9.372,
+      "voiceDuration": 7.652083
+    },
+    {
+      "id": "animal",
+      "text": "Vamos a anotar un peso. Toca Anotar un dato, elige peso de ganado y selecciona el animal.",
+      "file": "assets/voz/animal.wav",
+      "start": 17.824,
+      "duration": 8.064,
+      "voiceStart": 18.624000000000002,
+      "voiceDuration": 6.464
+    },
+    {
+      "id": "peso",
+      "text": "Escribe el peso. Indica si usaste báscula o cinta, y toca Continuar.",
+      "file": "assets/voz/peso.wav",
+      "start": 25.888,
+      "duration": 6.77,
+      "voiceStart": 26.688000000000002,
+      "voiceDuration": 5.169875
+    },
+    {
+      "id": "revision",
+      "text": "Revisa la anotación. Si algo está mal, puedes volver. Si todo está bien, toca Guardar pesaje.",
+      "file": "assets/voz/revision.wav",
+      "start": 32.658,
+      "duration": 8.394,
+      "voiceStart": 33.458,
+      "voiceDuration": 6.793625
+    },
+    {
+      "id": "guardado",
+      "text": "Listo. Verás un aviso de guardado. También puedes anotar cosechas, gastos y tareas sin internet, después de abrir la app una vez.",
+      "file": "assets/voz/guardado.wav",
+      "start": 41.052,
+      "duration": 10.886,
+      "voiceStart": 41.852,
+      "voiceDuration": 9.28575
+    },
+    {
+      "id": "ayuda",
+      "text": "En Ayuda puedes agrandar las letras. Guarda una copia protegida de tus datos y compártela con tu equipo.",
+      "file": "assets/voz/ayuda.wav",
+      "start": 51.938,
+      "duration": 8.932,
+      "voiceStart": 52.738,
+      "voiceDuration": 7.331625
+    },
+    {
+      "id": "final",
+      "text": "Abre el enlace de Finca Repelón. Para trabajar en Android sin conexión, descarga la app. Empieza con los datos de ejemplo.",
+      "file": "assets/voz/final.wav",
+      "start": 60.87,
+      "duration": 10.062,
+      "voiceStart": 61.669999999999995,
+      "voiceDuration": 8.461917
+    }
+  ],
+  "voiceAdjusted": true
+}

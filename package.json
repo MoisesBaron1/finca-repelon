@@ -9,7 +9,9 @@
     "test": "node --test tests/*.test.mjs",
     "test:browser": "node scripts/verify-browser.mjs",
     "test:hardening": "node scripts/verify-hardening.mjs",
-    "test:compatibility": "node scripts/verify-compatibility.mjs"
+    "test:compatibility": "node scripts/verify-compatibility.mjs",
+    "prepare:claude": "node scripts/create-claude-context.mjs",
+    "publish:github": "node scripts/publicar-github.mjs"
   },
   "dependencies": {
     "@fontsource/manrope": "5.2.8",

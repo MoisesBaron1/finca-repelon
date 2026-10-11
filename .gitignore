@@ -8,6 +8,15 @@ android/local.properties
 artifacts/
 android/app/src/main/assets/
 .env*
+# Configuración local, claves y copias privadas
+*.password
+*.finca
+.claude/settings.local.json
+.claude/worktrees/
+.venv/
+__pycache__/
+promo/.hyperframes/
+promo/exports/
 .vercel/
 .vercel
 .env*
