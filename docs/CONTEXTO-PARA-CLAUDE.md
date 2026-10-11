@@ -16,7 +16,7 @@ Se regenera desde la raíz con `npm run prepare:claude`.
 
 MVP gratuito de gestión de finca, en español, para personas mayores con poca experiencia tecnológica. La versión publicada es **0.3.0**. La app web y Android funcionan localmente; no hay backend, cuentas autenticadas ni sincronización automática. El repositorio incluye también el proyecto editable de HyperFrames en `promo/`.
 
-- GitHub de destino: https://github.com/MoisesBaron1/finca-repelon (privado; publicación pendiente de que el propietario cree el repositorio y permita acceso).
+- GitHub de destino: https://github.com/MoisesBaron1/finca-repelon (privado; publicación pendiente de habilitar el acceso de la conexión).
 - App: https://temporary-spry-jasper-gs4cyvp.vercel.app
 - Guía: https://temporary-spry-jasper-gs4cyvp.vercel.app/guia-promocional/
 - Publicación verificada el 7 de octubre de 2026. No confundas resultados históricos con verificaciones nuevas.
@@ -115,7 +115,7 @@ La página `/guia-promocional/` contiene un video vertical de 71 segundos creado
 
 ## Desarrollo y verificación
 
-El código completo está preparado para el repositorio privado [MoisesBaron1/finca-repelon](https://github.com/MoisesBaron1/finca-repelon); la publicación está pendiente de su creación por el propietario. Para continuar en Claude Code o en el chat de Claude, sigue [esta guía](docs/CONTINUAR-EN-CLAUDE.md). `CLAUDE.md` contiene las instrucciones del proyecto y `docs/PROMPT-PARA-CLAUDE.md` un mensaje inicial listo para copiar. El proyecto editable de HyperFrames está en [`promo/`](promo/README.md).
+El código completo está preparado para el repositorio privado [MoisesBaron1/finca-repelon](https://github.com/MoisesBaron1/finca-repelon); la publicación está pendiente de habilitar el acceso de la conexión GitHub. Para continuar en Claude Code o en el chat de Claude, sigue [esta guía](docs/CONTINUAR-EN-CLAUDE.md). `CLAUDE.md` contiene las instrucciones del proyecto y `docs/PROMPT-PARA-CLAUDE.md` un mensaje inicial listo para copiar. El proyecto editable de HyperFrames está en [`promo/`](promo/README.md).
 
 Requisitos web: Node 22 o 24 y npm. Requisitos Android: JDK 17 o 21 con compilador, SDK plataforma 35 y build-tools 35.0.0.
 
@@ -287,15 +287,15 @@ El navegador captura ubicación con la página visible. La transferencia entre e
 
 Entrega preparada el **11 de octubre de 2026**. El repositorio reúne el historial de la app, código web, Android, pruebas, documentación, descargas y el proyecto editable de HyperFrames. Las credenciales y claves de firma quedan fuera de Git.
 
-Repositorio privado de destino: https://github.com/MoisesBaron1/finca-repelon. La publicación está pendiente de que el propietario cree el repositorio y permita el acceso a la conexión GitHub.
+Repositorio privado de destino: https://github.com/MoisesBaron1/finca-repelon. El propietario indicó que creó el repositorio; la publicación está pendiente de habilitar el acceso de la conexión GitHub y confirmar su enlace.
 
 ## Completar la publicación en GitHub
 
-La cuenta conectada reconoce a MoisesBaron1, pero GitHub rechazó crear el repositorio: `CreateRepository` sin permisos y `HTTP 403 Resource not accessible by integration` en la API REST. No se han publicado archivos en GitHub todavía.
+La cuenta conectada reconoce a MoisesBaron1, pero GitHub rechazó crear el repositorio: `CreateRepository` sin permisos y `HTTP 403 Resource not accessible by integration` en la API REST. Después de que el propietario indicó su creación, la conexión siguió respondiendo 404 al consultar el destino y no mostró ninguna instalación autorizada. No se han publicado archivos en GitHub todavía.
 
 1. Abre https://github.com/new?name=finca-repelon&visibility=private con la cuenta MoisesBaron1.
 2. Crea `finca-repelon` **privado y vacío**, sin README, licencia ni `.gitignore` iniciales: la entrega ya incluye estos archivos y su historial.
-3. Si la conexión GitHub tiene acceso solo a repositorios seleccionados, añade `finca-repelon` a esa selección desde la configuración de la aplicación instalada.
+3. En ChatGPT, abre Configuración → Aplicaciones → GitHub y configura la instalación para permitir acceso a `finca-repelon`. Si el repositorio ya está creado, no lo vuelvas a crear. Confirma que pertenece a MoisesBaron1 o proporciona el enlace correcto.
 4. Avísale al asistente para completar la subida, o ejecuta desde esta carpeta `npm run publish:github` con GitHub CLI autenticado. El script conserva el remoto anterior, no hace force push y comprueba que el commit remoto coincide con el local.
 
 Mientras tanto puedes descargar el código completo y usarlo con Claude Code localmente. Para el chat, el archivo Markdown de contexto ya está preparado.

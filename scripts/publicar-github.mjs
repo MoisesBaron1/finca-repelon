@@ -9,7 +9,7 @@ const run=(command,args)=>execFileSync(command,args,{cwd:root,encoding:'utf8',st
 let info;
 try{info=JSON.parse(run('gh',['repo','view',repository,'--json','nameWithOwner,isPrivate']));}
 catch{
- console.error(`No se pudo abrir ${repository}. Crea el repositorio privado y vacío desde https://github.com/new?name=finca-repelon&visibility=private y permite su acceso a la conexión GitHub.`);
+ console.error(`No se pudo abrir ${repository}. Comprueba la cuenta, el nombre y el acceso de la conexión GitHub. Si todavía no existe, créalo privado y vacío desde https://github.com/new?name=finca-repelon&visibility=private.`);
  process.exit(1);
 }
 if(info.nameWithOwner.toLowerCase()!==repository.toLowerCase()||!info.isPrivate)throw new Error('El destino debe ser el repositorio privado acordado.');

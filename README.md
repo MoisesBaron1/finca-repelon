@@ -25,7 +25,7 @@ La página `/guia-promocional/` contiene un video vertical de 71 segundos creado
 
 ## Desarrollo y verificación
 
-El código completo está preparado para el repositorio privado [MoisesBaron1/finca-repelon](https://github.com/MoisesBaron1/finca-repelon); la publicación está pendiente de su creación por el propietario. Para continuar en Claude Code o en el chat de Claude, sigue [esta guía](docs/CONTINUAR-EN-CLAUDE.md). `CLAUDE.md` contiene las instrucciones del proyecto y `docs/PROMPT-PARA-CLAUDE.md` un mensaje inicial listo para copiar. El proyecto editable de HyperFrames está en [`promo/`](promo/README.md).
+El código completo está preparado para el repositorio privado [MoisesBaron1/finca-repelon](https://github.com/MoisesBaron1/finca-repelon); la publicación está pendiente de habilitar el acceso de la conexión GitHub. Para continuar en Claude Code o en el chat de Claude, sigue [esta guía](docs/CONTINUAR-EN-CLAUDE.md). `CLAUDE.md` contiene las instrucciones del proyecto y `docs/PROMPT-PARA-CLAUDE.md` un mensaje inicial listo para copiar. El proyecto editable de HyperFrames está en [`promo/`](promo/README.md).
 
 Requisitos web: Node 22 o 24 y npm. Requisitos Android: JDK 17 o 21 con compilador, SDK plataforma 35 y build-tools 35.0.0.
 
