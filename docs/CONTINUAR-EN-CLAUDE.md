@@ -2,11 +2,11 @@
 
 Entrega preparada el **11 de octubre de 2026**. El repositorio reúne el historial de la app, código web, Android, pruebas, documentación, descargas y el proyecto editable de HyperFrames. Las credenciales y claves de firma quedan fuera de Git.
 
-Repositorio público indicado por el propietario: https://github.com/MoisesBaron1/finca-repelon. Incluye código web, Android, pruebas, HyperFrames y documentación para Claude; no contiene credenciales ni claves de firma.
+Repositorio público indicado por el propietario: https://github.com/MoisesBaron1/finca-repelon. La entrega local incluye código web, Android, pruebas, HyperFrames y documentación para Claude; no contiene credenciales ni claves de firma. La subida al repositorio sigue pendiente de autorizar escritura.
 
 ## GitHub
 
-La conexión tiene acceso de escritura al repositorio. El historial de la app se conserva en la rama main. Para futuras subidas desde la carpeta original puedes ejecutar `npm run publish:github`; el script conserva el remoto anterior, no hace force push y comprueba el commit remoto. Desde un clon de GitHub usa tu flujo habitual de ramas y pull requests.
+El repositorio ya es visible y su enlace está confirmado. La conexión aún rechaza escritura con error 403 tanto por Git como por la API; los permisos del propietario en la ficha del repositorio no son los permisos efectivos de la aplicación. Para completar la subida, configura GitHub en las Aplicaciones de ChatGPT y autoriza la aplicación para este repositorio. El historial completo se conserva en la entrega local, rama main. Para futuras subidas desde la carpeta original puedes ejecutar `npm run publish:github`; el script conserva el remoto anterior, no hace force push y comprueba el commit remoto. Desde un clon de GitHub usa tu flujo habitual de ramas y pull requests.
 
 ## Opción recomendada: Claude Code
 
