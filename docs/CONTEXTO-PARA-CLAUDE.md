@@ -16,7 +16,7 @@ Se regenera desde la raíz con `npm run prepare:claude`.
 
 MVP gratuito de gestión de finca, en español, para personas mayores con poca experiencia tecnológica. La versión publicada es **0.3.0**. La app web y Android funcionan localmente; no hay backend, cuentas autenticadas ni sincronización automática. El repositorio incluye también el proyecto editable de HyperFrames en `promo/`.
 
-- GitHub de destino: https://github.com/MoisesBaron1/finca-repelon (público, destino indicado por el propietario).
+- GitHub de destino: https://github.com/MoisesBaron1/finca-repelon (público, destino indicado por el propietario; subida pendiente por rechazo 403 desde el entorno).
 - App: https://temporary-spry-jasper-gs4cyvp.vercel.app
 - Guía: https://temporary-spry-jasper-gs4cyvp.vercel.app/guia-promocional/
 - Publicación verificada el 7 de octubre de 2026. No confundas resultados históricos con verificaciones nuevas.
@@ -291,7 +291,33 @@ Repositorio público indicado por el propietario: https://github.com/MoisesBaron
 
 ## GitHub
 
-El repositorio ya es visible y su enlace está confirmado. La conexión aún rechaza escritura con error 403 tanto por Git como por la API; los permisos del propietario en la ficha del repositorio no son los permisos efectivos de la aplicación. Para completar la subida, configura GitHub en las Aplicaciones de ChatGPT y autoriza la aplicación para este repositorio. El historial completo se conserva en la entrega local, rama main. Para futuras subidas desde la carpeta original puedes ejecutar `npm run publish:github`; el script conserva el remoto anterior, no hace force push y comprueba el commit remoto. Desde un clon de GitHub usa tu flujo habitual de ramas y pull requests.
+El repositorio ya es visible y su enlace está confirmado. La escritura desde este entorno sigue recibiendo 403 por Git y API, incluso después de configurar la conexión y autorizar GitHub CLI. Los permisos del propietario en la ficha del repositorio no demuestran acceso de escritura efectivo para estas solicitudes. No se han publicado archivos. El historial completo se conserva en la entrega local, rama main. Para futuras subidas desde la carpeta original puedes ejecutar `npm run publish:github`; el script conserva el remoto anterior, no hace force push y comprueba el commit remoto. Desde un clon de GitHub usa tu flujo habitual de ramas y pull requests.
+
+## Empezar ahora desde el paquete completo
+
+Descomprime `Finca-Repelon-Para-Claude.zip`. Incluye el código ZIP, contexto Markdown y un archivo Git bundle con todo el historial. Con Git, Node y Claude Code instalados, abre una terminal en la carpeta descomprimida:
+
+```sh
+git clone --branch main Finca-Repelon-Historial.bundle finca-repelon
+cd finca-repelon
+npm ci
+claude
+```
+
+Claude leerá `CLAUDE.md` y podrá trabajar con todo el código de inmediato. No clones todavía el repositorio vacío esperando encontrar allí la app.
+
+## Completar la subida desde tu equipo
+
+Desde el clon del bundle anterior, con GitHub CLI instalado:
+
+```sh
+gh auth login --hostname github.com --git-protocol https --web --scopes repo
+npm run publish:github
+```
+
+Inicia sesión como MoisesBaron1. El script publica main en el destino confirmado, preserva el historial y verifica el commit remoto, sin hacer force push. Este procedimiento requiere tu terminal local: la autorización realizada en el entorno de entrega no inicia sesión automáticamente en tu equipo. Si tu propia autenticación también rechaza escritura, revisa sus permisos antes de reintentar.
+
+Una vez publicado, puedes seguir usando el clon actual o clonar normalmente desde GitHub con los pasos siguientes.
 
 ## Opción recomendada: Claude Code
 
