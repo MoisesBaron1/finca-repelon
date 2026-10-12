@@ -2,24 +2,17 @@
 
 Entrega preparada el **11 de octubre de 2026**. El repositorio reúne el historial de la app, código web, Android, pruebas, documentación, descargas y el proyecto editable de HyperFrames. Las credenciales y claves de firma quedan fuera de Git.
 
-Repositorio privado de destino: https://github.com/MoisesBaron1/finca-repelon. El propietario indicó que creó el repositorio; la publicación está pendiente de habilitar el acceso de la conexión GitHub y confirmar su enlace.
+Repositorio público indicado por el propietario: https://github.com/MoisesBaron1/finca-repelon. Incluye código web, Android, pruebas, HyperFrames y documentación para Claude; no contiene credenciales ni claves de firma.
 
-## Completar la publicación en GitHub
+## GitHub
 
-La cuenta conectada reconoce a MoisesBaron1, pero GitHub rechazó crear el repositorio: `CreateRepository` sin permisos y `HTTP 403 Resource not accessible by integration` en la API REST. Después de que el propietario indicó su creación, la conexión siguió respondiendo 404 al consultar el destino y no mostró ninguna instalación autorizada. No se han publicado archivos en GitHub todavía.
-
-1. Abre https://github.com/new?name=finca-repelon&visibility=private con la cuenta MoisesBaron1.
-2. Crea `finca-repelon` **privado y vacío**, sin README, licencia ni `.gitignore` iniciales: la entrega ya incluye estos archivos y su historial.
-3. En ChatGPT, abre Configuración → Aplicaciones → GitHub y configura la instalación para permitir acceso a `finca-repelon`. Si el repositorio ya está creado, no lo vuelvas a crear. Confirma que pertenece a MoisesBaron1 o proporciona el enlace correcto.
-4. Avísale al asistente para completar la subida, o ejecuta desde esta carpeta `npm run publish:github` con GitHub CLI autenticado. El script conserva el remoto anterior, no hace force push y comprueba que el commit remoto coincide con el local.
-
-Mientras tanto puedes descargar el código completo y usarlo con Claude Code localmente. Para el chat, el archivo Markdown de contexto ya está preparado.
+La conexión tiene acceso de escritura al repositorio. El historial de la app se conserva en la rama main. Para futuras subidas desde la carpeta original puedes ejecutar `npm run publish:github`; el script conserva el remoto anterior, no hace force push y comprueba el commit remoto. Desde un clon de GitHub usa tu flujo habitual de ramas y pull requests.
 
 ## Opción recomendada: Claude Code
 
 Claude Code permite editar los archivos y ejecutar las pruebas en tu equipo. Usa la documentación oficial de instalación y acceso en https://code.claude.com/docs. El funcionamiento gratuito de la app es independiente del plan o consumo de Claude que elijas.
 
-1. Instala Git, Node 22 o 24 y Claude Code. Para un repositorio privado, inicia sesión en GitHub CLI con `gh auth login` si todavía no tienes acceso configurado.
+1. Instala Git, Node 22 o 24 y Claude Code. Para tu repositorio, inicia sesión en GitHub CLI con `gh auth login` si todavía no tienes acceso configurado.
 2. Descarga el repositorio y abre Claude dentro de su carpeta:
 
 ```sh
@@ -48,7 +41,7 @@ git push -u origin mejora/descripcion-corta
 
 ## Si prefieres el chat de Claude
 
-Si tu cuenta ofrece integración con GitHub, conéctala desde Claude y concede acceso al repositorio privado `MoisesBaron1/finca-repelon`. Añade los archivos relevantes a un proyecto o conversación. La disponibilidad y los permisos de esa integración dependen de Claude y de tu cuenta.
+Si tu cuenta ofrece integración con GitHub, conéctala desde Claude y concede acceso al repositorio `MoisesBaron1/finca-repelon`. Añade los archivos relevantes a un proyecto o conversación. La disponibilidad y los permisos de esa integración dependen de Claude y de tu cuenta.
 
 También puedes trabajar sin conector: carga `docs/CONTEXTO-PARA-CLAUDE.md`, copia el mensaje de `docs/PROMPT-PARA-CLAUDE.md` y añade los archivos de código afectados por la tarea. El contexto explica arquitectura, producto y estado, pero no sustituye el código completo. Para ejecutar cambios y pruebas usa Claude Code o tu editor local.
 

@@ -12,7 +12,7 @@ catch{
  console.error(`No se pudo abrir ${repository}. Comprueba la cuenta, el nombre y el acceso de la conexión GitHub. Si todavía no existe, créalo privado y vacío desde https://github.com/new?name=finca-repelon&visibility=private.`);
  process.exit(1);
 }
-if(info.nameWithOwner.toLowerCase()!==repository.toLowerCase()||!info.isPrivate)throw new Error('El destino debe ser el repositorio privado acordado.');
+if(info.nameWithOwner.toLowerCase()!==repository.toLowerCase())throw new Error('El destino debe ser el repositorio acordado.');
 if(run('git',['status','--porcelain']))throw new Error('Guarda y revisa los cambios en un commit antes de publicar.');
 if(run('git',['branch','--show-current'])!=='main')throw new Error('La entrega inicial debe publicarse desde la rama main.');
 const names=run('git',['ls-files']).split('\n');
