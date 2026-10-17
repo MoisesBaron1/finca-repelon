@@ -15,6 +15,12 @@ SHA-256 de la APK 0.3.1: `564a6c281b1490f40a94eb95719b0165a4f365c979ef26fd592243
 
 No se ejecutó en un teléfono físico. El GPS con pantalla bloqueada, la batería, el tiempo hasta conseguir posición sin datos móviles y la precisión bajo vegetación deben comprobarse en la prueba real. La guía incluye una prueba corta previa y una hoja de resultados. En navegador el GPS requiere la página visible. No hay sincronización automática al recuperar señal.
 
+## Publicación de campo confirmada
+
+Despliegue Vercel `dpl_AEp31LiMZFtV8o8pL31Aj9KmiCT1`, estado READY, commit de aplicación `ff980d3`, dominio conservado: https://temporary-spry-jasper-gs4cyvp.vercel.app.
+
+Se comprobó sin sesión Vercel: versión 0.3.1 en Ayuda, reapertura sin red, comprobación local repetida y guía integrada. El recorrido público de anotación y recarga offline también pasó. HTML apunta a `index-DnAcn8x9.js`. APK y PDF de campo responden 200 y coinciden byte por byte con las entregas verificadas. SHA-256 del PDF: `0cdaebc88695f334b440b9b46a4c3193950652b9b740a729e9f4913ede7e261d`.
+
 ---
 
 # Verificación de la versión 0.3.0 · 7 de octubre de 2026

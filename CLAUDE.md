@@ -7,7 +7,7 @@ MVP gratuito de gestión de finca, en español, para personas mayores con poca e
 - GitHub: https://github.com/MoisesBaron1/finca-repelon (público, código e historial publicados y verificados).
 - App: https://temporary-spry-jasper-gs4cyvp.vercel.app
 - Guía: https://temporary-spry-jasper-gs4cyvp.vercel.app/guia-promocional/
-- Publicación verificada el 7 de octubre de 2026. No confundas resultados históricos con verificaciones nuevas.
+- Publicación 0.3.1 verificada en el dominio habitual, incluida operación offline y APK. No confundas resultados históricos con verificaciones nuevas.
 
 Lee primero `README.md`, `docs/CONTINUAR-EN-CLAUDE.md`, `docs/CONTRATO.md`, `docs/ALCANCE.md` y `docs/VERIFICACION.md`. Para interfaz lee también `DESIGN.md` y `PRODUCT.md`. No necesitas el historial del chat para trabajar.
 
