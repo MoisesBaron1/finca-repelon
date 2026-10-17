@@ -32,7 +32,7 @@ La guía de campo está en `docs/GUIA-SIN-SENAL.md`. `npm run test:field` verifi
 - `src/easy-ui.jsx`, `src/Forms.jsx`, `src/components.jsx`, `src/pages.jsx`: formularios y pantallas.
 - `src/compat.mjs`: fallbacks seguros para WebViews antiguos; debe importarse primero. Compilación objetivo Chrome 80.
 - `src/photo.mjs`, `src/exports.mjs`: reducción de fotos e informes en español.
-- `android/app/src/main/java/co/repelon/finca/`: WebView, SQLite y servicio GPS; applicationId `co.repelon.finca`, versionCode 5, Android 8+.
+- `android/app/src/main/java/co/repelon/finca/`: WebView, SQLite y servicio GPS; applicationId `co.repelon.finca`, versionCode 6, Android 8+.
 - `public/guia-promocional/` y `public/downloads/`: página y entregables publicados.
 - `promo/`: composiciones, imágenes, audios, guion y herramientas HyperFrames 0.8.112. Lee sus instrucciones antes de modificar videos.
 

@@ -22,7 +22,7 @@ async function checkDownload(){
 export function FieldHelp(){
  const [status,setStatus]=useState('checking');
  useEffect(()=>{let alive=true;checkDownload().then(result=>{if(alive)setStatus(result)});return()=>{alive=false}},[]);
- async function retry(){setStatus('checking');try{if(!isNative()&&'serviceWorker' in navigator){const registration=await navigator.serviceWorker.register(new URL('sw.js',document.baseURI));await registration.update();}}catch{}setStatus(await checkDownload());}
+ async function retry(){setStatus('checking');setStatus(await checkDownload());}
  return <section aria-label="Preparación sin señal"><p className="muted">Versión {version}</p>
  <p role="status"><strong>{status==='checking'?'Comprobando la descarga…':status==='native'?'La app Android está incluida en este teléfono.':status==='ready'?'App guardada para abrir sin señal.':'Falta completar la descarga de la app.'}</strong></p>
  {status==='missing'&&<p>Con internet, vuelve a abrir la app y espera un momento. Después comprueba otra vez. Todavía no se ha confirmado que puedas reabrirla sin señal.</p>}

@@ -3,15 +3,15 @@
 Se reprodujo un fallo al reabrir con la red aparentemente conectada pero sin respuesta: la navegación agotaba el tiempo de espera aunque la app estuviera descargada. El service worker ahora sirve los documentos locales ya guardados antes de intentar red. La prueba falló antes y pasó después.
 
 - `npm test`: 53 pruebas aprobadas, ninguna omitida.
-- `npm run test:field`: cuatro grupos aprobados: arranque con navegación de red bloqueada; modo avión, nueva pantalla y pesaje persistente tras recargar; descarga de copia cifrada offline; advertencia real al faltar un archivo en caché.
+- `npm run test:field`: cinco grupos aprobados: comprobación local de descarga sin esperar actualización de red; arranque con navegación de red bloqueada; modo avión, nueva pantalla y pesaje persistente tras recargar; descarga de copia cifrada offline; advertencia real al faltar un archivo en caché.
 - `npm run test:browser`, `test:hardening`, `test:compatibility`: 12, 7 y 3 grupos aprobados. Se conservan los flujos, copias, conflictos, compatibilidad y separación de datos.
 - Ayuda incorpora versión visible, comprobación de descarga por mensaje al service worker activo y guía de campo disponible dentro de la app. No se anuncia preparación si falta un recurso. Ayuda pasó Axe WCAG A/AA y adaptación a 320/390/720 px; no es una certificación completa.
 - `npm run build`: satisfactorio, 18 recursos offline. Videos, APK y PDFs de descargas no se precargan; deben descargarse antes de salir. La guía de texto integrada en Ayuda sí se incluye.
 - `node scripts/verify-promo.mjs`: aprobado, con reproducción de video, accesibilidad, adaptación y cuatro descargas válidas.
-- Android `:app:assembleRelease --offline`: satisfactorio. Versión `0.3.1-piloto`, versionCode 5, applicationId y SQLite conservados. Firma v2/v3 válida con el mismo certificado del piloto. Todos los recursos web empaquetados coinciden byte por byte con dist. El manifiesto sigue sin permiso de Internet.
+- Android `:app:assembleRelease --offline`: satisfactorio. Versión `0.3.1-piloto`, versionCode 6, applicationId y SQLite conservados. Firma v2/v3 válida con el mismo certificado del piloto. Todos los recursos web empaquetados coinciden byte por byte con dist. El manifiesto sigue sin permiso de Internet.
 - Manual general actualizado y nueva guía de campo PDF de tres páginas, además de `GUIA-SIN-SENAL.md`.
 
-SHA-256 de la APK 0.3.1: `8a21843c36c7ec2a8092e0c87537de4ee8630e650a27826820b394bfc358f742`.
+SHA-256 de la APK 0.3.1: `564a6c281b1490f40a94eb95719b0165a4f365c979ef26fd5922434f1d56fc88`.
 
 No se ejecutó en un teléfono físico. El GPS con pantalla bloqueada, la batería, el tiempo hasta conseguir posición sin datos móviles y la precisión bajo vegetación deben comprobarse en la prueba real. La guía incluye una prueba corta previa y una hoja de resultados. En navegador el GPS requiere la página visible. No hay sincronización automática al recuperar señal.
 

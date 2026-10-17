@@ -4,10 +4,10 @@ import {readFile} from 'node:fs/promises';
 import {resolve,extname} from 'node:path';
 import assert from 'node:assert/strict';
 
-let stalled=false;
+let stalled=false,stalledWorker=false;
 const root=resolve('dist');
 const server=createServer(async(req,res)=>{
- if(stalled&&req.headers['sec-fetch-mode']==='navigate')return;
+ if(stalled&&req.headers['sec-fetch-mode']==='navigate'||stalledWorker&&req.url==='/sw.js')return;
  try{
   let path=decodeURIComponent(new URL(req.url,'http://local').pathname);if(path.endsWith('/'))path+='index.html';
   const file=resolve(root,'.'+path);if(!file.startsWith(root+'/'))throw new Error('path');
@@ -30,6 +30,8 @@ try{
  console.log('PASS: reapertura inmediata con conexión aparente y red sin respuesta');
  await page.getByRole('button',{name:'Ayuda',exact:true}).click();
  await page.getByText('App guardada para abrir sin señal.',{exact:true}).waitFor();
+ stalledWorker=true;await page.getByRole('button',{name:'Comprobar descarga otra vez',exact:true}).click();await page.getByText('App guardada para abrir sin señal.',{exact:true}).waitFor({timeout:2200});stalledWorker=false;
+ console.log('PASS: comprobar la descarga no espera una actualización de red bloqueada');
  await page.getByRole('button',{name:'Cerrar',exact:true}).click();
  await context.setOffline(true);
  await page.reload();await home().waitFor();

@@ -25,7 +25,7 @@ La página `/guia-promocional/` contiene un video vertical de 71 segundos creado
 
 ## Prueba en la finca sin señal
 
-La versión 0.3.1 abre desde la descarga local sin esperar una red que no responde. En Ayuda comprueba la descarga y consulta los pasos de campo. Sigue [la guía sin señal](docs/GUIA-SIN-SENAL.md) y descarga el [PDF](public/downloads/Guia-Sin-Senal-Finca-Repelon.pdf) antes de salir. La APK mantiene su firma y usa versionCode 5. Ejecuta `npm run test:field` para verificar el flujo sin red.
+La versión 0.3.1 abre desde la descarga local sin esperar una red que no responde. En Ayuda comprueba la descarga y consulta los pasos de campo. Sigue [la guía sin señal](docs/GUIA-SIN-SENAL.md) y descarga el [PDF](public/downloads/Guia-Sin-Senal-Finca-Repelon.pdf) antes de salir. La APK mantiene su firma y usa versionCode 6. Ejecuta `npm run test:field` para verificar el flujo sin red.
 
 ## Desarrollo y verificación
 
