@@ -6,8 +6,8 @@ android {
         applicationId = "co.repelon.finca"
         minSdk = 26
         targetSdk = 35
-        versionCode = 4
-        versionName = "0.3.0-piloto"
+        versionCode = 5
+        versionName = "0.3.1-piloto"
     }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }

@@ -23,6 +23,10 @@ El navegador funciona offline después de completar la primera descarga. Para la
 
 La página `/guia-promocional/` contiene un video vertical de 71 segundos creado con HyperFrames, una versión ligera para WhatsApp, la guía PDF y las descargas del piloto. La configuración y los pasos para publicar gratuitamente en Vercel están en [docs/VERCEL.md](docs/VERCEL.md). Cambiar de enlace requiere traer una copia protegida de los datos del navegador anterior.
 
+## Prueba en la finca sin señal
+
+La versión 0.3.1 abre desde la descarga local sin esperar una red que no responde. En Ayuda comprueba la descarga y consulta los pasos de campo. Sigue [la guía sin señal](docs/GUIA-SIN-SENAL.md) y descarga el [PDF](public/downloads/Guia-Sin-Senal-Finca-Repelon.pdf) antes de salir. La APK mantiene su firma y usa versionCode 5. Ejecuta `npm run test:field` para verificar el flujo sin red.
+
 ## Desarrollo y verificación
 
 El código completo está publicado en [MoisesBaron1/finca-repelon](https://github.com/MoisesBaron1/finca-repelon), repositorio público indicado por el propietario, con el historial de la app, Android y el proyecto editable de HyperFrames. Para continuar en Claude Code o en el chat de Claude, sigue [esta guía](docs/CONTINUAR-EN-CLAUDE.md). `CLAUDE.md` contiene las instrucciones del proyecto y `docs/PROMPT-PARA-CLAUDE.md` un mensaje inicial listo para copiar. El proyecto editable de HyperFrames está en [`promo/`](promo/README.md).

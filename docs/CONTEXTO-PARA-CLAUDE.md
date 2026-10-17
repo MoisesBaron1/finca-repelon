@@ -1,6 +1,6 @@
 # Finca Repelón · Contexto para continuar en Claude
 
-Versión de la app: 0.3.0. Repositorio: https://github.com/MoisesBaron1/finca-repelon.
+Versión de la app: 0.3.1. Repositorio: https://github.com/MoisesBaron1/finca-repelon.
 
 Este archivo reúne instrucciones y documentación; no contiene el código completo ni credenciales. Los resultados de pruebas que aparecen tienen sus propias fechas y deben repetirse cuando corresponda. Para modificar código usa el repositorio local con Claude Code, conecta GitHub si tu cuenta lo admite o adjunta los archivos afectados.
 
@@ -14,7 +14,7 @@ Se regenera desde la raíz con `npm run prepare:claude`.
 
 ## Objetivo y estado
 
-MVP gratuito de gestión de finca, en español, para personas mayores con poca experiencia tecnológica. La versión publicada es **0.3.0**. La app web y Android funcionan localmente; no hay backend, cuentas autenticadas ni sincronización automática. El repositorio incluye también el proyecto editable de HyperFrames en `promo/`.
+MVP gratuito de gestión de finca, en español, para personas mayores con poca experiencia tecnológica. La versión publicada es **0.3.1**. La app web y Android funcionan localmente; no hay backend, cuentas autenticadas ni sincronización automática. El repositorio incluye también el proyecto editable de HyperFrames en `promo/`.
 
 - GitHub: https://github.com/MoisesBaron1/finca-repelon (público, código e historial publicados y verificados).
 - App: https://temporary-spry-jasper-gs4cyvp.vercel.app
@@ -33,6 +33,8 @@ Lee primero `README.md`, `docs/CONTINUAR-EN-CLAUDE.md`, `docs/CONTRATO.md`, `doc
 6. Conserva el dominio Vercel: cambiar de origen cambia el almacenamiento del navegador. La publicación no constituye autorización permanente para futuros despliegues; atiende la petición vigente del propietario.
 7. No subas `.env*`, `.vercel/`, claves Android, contraseñas, copias `.finca` ni datos reales. Las claves de firma deben mantenerse fuera de Git; otra firma impide actualizar la APK instalada sin desinstalar.
 
+La guía de campo está en `docs/GUIA-SIN-SENAL.md`. `npm run test:field` verifica arranque con red sin respuesta, guardado y copia offline, y detección de caché incompleta.
+
 ## Mapa del código
 
 - `src/domain.mjs`: validación, eventos, materialización causal, conflictos, GPS, pesos, unidades y CSV.
@@ -42,7 +44,7 @@ Lee primero `README.md`, `docs/CONTINUAR-EN-CLAUDE.md`, `docs/CONTRATO.md`, `doc
 - `src/easy-ui.jsx`, `src/Forms.jsx`, `src/components.jsx`, `src/pages.jsx`: formularios y pantallas.
 - `src/compat.mjs`: fallbacks seguros para WebViews antiguos; debe importarse primero. Compilación objetivo Chrome 80.
 - `src/photo.mjs`, `src/exports.mjs`: reducción de fotos e informes en español.
-- `android/app/src/main/java/co/repelon/finca/`: WebView, SQLite y servicio GPS; applicationId `co.repelon.finca`, versionCode 4, Android 8+.
+- `android/app/src/main/java/co/repelon/finca/`: WebView, SQLite y servicio GPS; applicationId `co.repelon.finca`, versionCode 5, Android 8+.
 - `public/guia-promocional/` y `public/downloads/`: página y entregables publicados.
 - `promo/`: composiciones, imágenes, audios, guion y herramientas HyperFrames 0.8.112. Lee sus instrucciones antes de modificar videos.
 
@@ -112,6 +114,10 @@ La versión 0.3.0 amplía los formularios por pasos, guía el primer animal, lot
 El navegador funciona offline después de completar la primera descarga. Para la jornada con pantalla bloqueada utiliza la APK, que contiene todos sus recursos locales y no requiere conexión.
 
 La página `/guia-promocional/` contiene un video vertical de 71 segundos creado con HyperFrames, una versión ligera para WhatsApp, la guía PDF y las descargas del piloto. La configuración y los pasos para publicar gratuitamente en Vercel están en [docs/VERCEL.md](docs/VERCEL.md). Cambiar de enlace requiere traer una copia protegida de los datos del navegador anterior.
+
+## Prueba en la finca sin señal
+
+La versión 0.3.1 abre desde la descarga local sin esperar una red que no responde. En Ayuda comprueba la descarga y consulta los pasos de campo. Sigue [la guía sin señal](docs/GUIA-SIN-SENAL.md) y descarga el [PDF](public/downloads/Guia-Sin-Senal-Finca-Repelon.pdf) antes de salir. La APK mantiene su firma y usa versionCode 5. Ejecuta `npm run test:field` para verificar el flujo sin red.
 
 ## Desarrollo y verificación
 
@@ -238,6 +244,25 @@ Pendientes de H0/H5: inventario real, autorización de modelos de teléfono, 8 h
 ---
 
 ## Documento: docs/VERIFICACION.md
+
+# Verificación de campo · versión 0.3.1
+
+Se reprodujo un fallo al reabrir con la red aparentemente conectada pero sin respuesta: la navegación agotaba el tiempo de espera aunque la app estuviera descargada. El service worker ahora sirve los documentos locales ya guardados antes de intentar red. La prueba falló antes y pasó después.
+
+- `npm test`: 53 pruebas aprobadas, ninguna omitida.
+- `npm run test:field`: cuatro grupos aprobados: arranque con navegación de red bloqueada; modo avión, nueva pantalla y pesaje persistente tras recargar; descarga de copia cifrada offline; advertencia real al faltar un archivo en caché.
+- `npm run test:browser`, `test:hardening`, `test:compatibility`: 12, 7 y 3 grupos aprobados. Se conservan los flujos, copias, conflictos, compatibilidad y separación de datos.
+- Ayuda incorpora versión visible, comprobación de descarga por mensaje al service worker activo y guía de campo disponible dentro de la app. No se anuncia preparación si falta un recurso. Ayuda pasó Axe WCAG A/AA y adaptación a 320/390/720 px; no es una certificación completa.
+- `npm run build`: satisfactorio, 18 recursos offline. Videos, APK y PDFs de descargas no se precargan; deben descargarse antes de salir. La guía de texto integrada en Ayuda sí se incluye.
+- `node scripts/verify-promo.mjs`: aprobado, con reproducción de video, accesibilidad, adaptación y cuatro descargas válidas.
+- Android `:app:assembleRelease --offline`: satisfactorio. Versión `0.3.1-piloto`, versionCode 5, applicationId y SQLite conservados. Firma v2/v3 válida con el mismo certificado del piloto. Todos los recursos web empaquetados coinciden byte por byte con dist. El manifiesto sigue sin permiso de Internet.
+- Manual general actualizado y nueva guía de campo PDF de tres páginas, además de `GUIA-SIN-SENAL.md`.
+
+SHA-256 de la APK 0.3.1: `8a21843c36c7ec2a8092e0c87537de4ee8630e650a27826820b394bfc358f742`.
+
+No se ejecutó en un teléfono físico. El GPS con pantalla bloqueada, la batería, el tiempo hasta conseguir posición sin datos móviles y la precisión bajo vegetación deben comprobarse en la prueba real. La guía incluye una prueba corta previa y una hoja de resultados. En navegador el GPS requiere la página visible. No hay sincronización automática al recuperar señal.
+
+---
 
 # Verificación de la versión 0.3.0 · 7 de octubre de 2026
 
@@ -404,7 +429,7 @@ Copia este texto al abrir Claude Code o el proyecto de Claude:
 ```text
 Continúa el proyecto Finca Repelón del repositorio MoisesBaron1/finca-repelon.
 Es un MVP gratuito, offline y completamente en español para personas mayores
-con poca experiencia tecnológica. La versión publicada es 0.3.0.
+con poca experiencia tecnológica. La versión publicada es 0.3.1.
 
 Lee CLAUDE.md, README.md, docs/CONTINUAR-EN-CLAUDE.md, docs/CONTRATO.md,
 docs/ALCANCE.md y docs/VERIFICACION.md. Si solo tienes el paquete de contexto,

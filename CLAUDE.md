@@ -2,7 +2,7 @@
 
 ## Objetivo y estado
 
-MVP gratuito de gestión de finca, en español, para personas mayores con poca experiencia tecnológica. La versión publicada es **0.3.0**. La app web y Android funcionan localmente; no hay backend, cuentas autenticadas ni sincronización automática. El repositorio incluye también el proyecto editable de HyperFrames en `promo/`.
+MVP gratuito de gestión de finca, en español, para personas mayores con poca experiencia tecnológica. La versión publicada es **0.3.1**. La app web y Android funcionan localmente; no hay backend, cuentas autenticadas ni sincronización automática. El repositorio incluye también el proyecto editable de HyperFrames en `promo/`.
 
 - GitHub: https://github.com/MoisesBaron1/finca-repelon (público, código e historial publicados y verificados).
 - App: https://temporary-spry-jasper-gs4cyvp.vercel.app
@@ -21,6 +21,8 @@ Lee primero `README.md`, `docs/CONTINUAR-EN-CLAUDE.md`, `docs/CONTRATO.md`, `doc
 6. Conserva el dominio Vercel: cambiar de origen cambia el almacenamiento del navegador. La publicación no constituye autorización permanente para futuros despliegues; atiende la petición vigente del propietario.
 7. No subas `.env*`, `.vercel/`, claves Android, contraseñas, copias `.finca` ni datos reales. Las claves de firma deben mantenerse fuera de Git; otra firma impide actualizar la APK instalada sin desinstalar.
 
+La guía de campo está en `docs/GUIA-SIN-SENAL.md`. `npm run test:field` verifica arranque con red sin respuesta, guardado y copia offline, y detección de caché incompleta.
+
 ## Mapa del código
 
 - `src/domain.mjs`: validación, eventos, materialización causal, conflictos, GPS, pesos, unidades y CSV.
@@ -30,7 +32,7 @@ Lee primero `README.md`, `docs/CONTINUAR-EN-CLAUDE.md`, `docs/CONTRATO.md`, `doc
 - `src/easy-ui.jsx`, `src/Forms.jsx`, `src/components.jsx`, `src/pages.jsx`: formularios y pantallas.
 - `src/compat.mjs`: fallbacks seguros para WebViews antiguos; debe importarse primero. Compilación objetivo Chrome 80.
 - `src/photo.mjs`, `src/exports.mjs`: reducción de fotos e informes en español.
-- `android/app/src/main/java/co/repelon/finca/`: WebView, SQLite y servicio GPS; applicationId `co.repelon.finca`, versionCode 4, Android 8+.
+- `android/app/src/main/java/co/repelon/finca/`: WebView, SQLite y servicio GPS; applicationId `co.repelon.finca`, versionCode 5, Android 8+.
 - `public/guia-promocional/` y `public/downloads/`: página y entregables publicados.
 - `promo/`: composiciones, imágenes, audios, guion y herramientas HyperFrames 0.8.112. Lee sus instrucciones antes de modificar videos.
 

@@ -1,4 +1,4 @@
-# Interfaz para personas mayores · 0.3.0
+# Interfaz para personas mayores · 0.3.1
 
 El objetivo es que personas con poca experiencia tecnológica encuentren una tarea, hagan una anotación y sepan si quedó guardada desde su teléfono.
 
@@ -18,3 +18,5 @@ El objetivo es que personas con poca experiencia tecnológica encuentren una tar
 Se mantienen el almacenamiento local, la operación gratuita, los espacios de ejemplo y reales, el contrato de intercambio y las reglas conservadoras del GPS. No se añaden servicios de pago ni cuentas obligatorias.
 
 La verificación automática y sus límites están en `VERIFICACION.md`. La facilidad de uso debe comprobarse con los trabajadores reales durante el piloto.
+
+La versión 0.3.1 añade en Ayuda una comprobación de la descarga para reabrir sin señal y una guía de campo desplegable. El arranque no espera a una red que no responde cuando ya existe la descarga local. El PDF de campo está en `public/downloads/Guia-Sin-Senal-Finca-Repelon.pdf`; debe guardarse antes de salir.

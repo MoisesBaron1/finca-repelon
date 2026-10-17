@@ -5,7 +5,7 @@ Copia este texto al abrir Claude Code o el proyecto de Claude:
 ```text
 Continúa el proyecto Finca Repelón del repositorio MoisesBaron1/finca-repelon.
 Es un MVP gratuito, offline y completamente en español para personas mayores
-con poca experiencia tecnológica. La versión publicada es 0.3.0.
+con poca experiencia tecnológica. La versión publicada es 0.3.1.
 
 Lee CLAUDE.md, README.md, docs/CONTINUAR-EN-CLAUDE.md, docs/CONTRATO.md,
 docs/ALCANCE.md y docs/VERIFICACION.md. Si solo tienes el paquete de contexto,
